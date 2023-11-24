@@ -1,0 +1,68 @@
+diff --git a/SOURCES/0063-Add-friendly-grub2-password-config-tool-985962.patch b/SOURCES/0063-Add-friendly-grub2-password-config-tool-985962.patch
+index f7cbd0a..6b700ad 100644
+--- a/SOURCES/0063-Add-friendly-grub2-password-config-tool-985962.patch
++++ b/SOURCES/0063-Add-friendly-grub2-password-config-tool-985962.patch
+@@ -158,7 +158,7 @@ index 000000000..dd76f00fc
+ +$0 prompts the user to set a password on the grub bootloader. The password
+ +is written to a file named user.cfg.
+ +
+-+Report bugs at https://bugzilla.redhat.com.
+++Report bugs at https://bugs.openela.org.
+ +EOF
+ +}
+ +
+diff --git a/SOURCES/0069-Clean-up-grub-setpassword-documentation-1290799.patch b/SOURCES/0069-Clean-up-grub-setpassword-documentation-1290799.patch
+index 65460be..f1275a1 100644
+--- a/SOURCES/0069-Clean-up-grub-setpassword-documentation-1290799.patch
++++ b/SOURCES/0069-Clean-up-grub-setpassword-documentation-1290799.patch
+@@ -51,5 +51,5 @@ index fb9d3a3b6..c8c0fa419 100644
+ +  -v, --version                  print the version information and exit
+ +  -o, --output_path <DIRECTORY>  put user.cfg in a user-selected directory
+  
+- Report bugs at https://bugzilla.redhat.com.
++ Report bugs at https://bugs.openela.org.
+  EOF
+diff --git a/SOURCES/grub.macros b/SOURCES/grub.macros
+index c9ed442..bf9e5fd 100644
+--- a/SOURCES/grub.macros
++++ b/SOURCES/grub.macros
+@@ -401,10 +401,8 @@ done								\
+ 	-p /EFI/BOOT -d grub-core				\\\
+ 	--sbat %{4}./sbat.csv					\\\
+ 	${GRUB_MODULES}						\
+-%{expand:%%{pesign -s -i %%{2}.orig -o %%{2}.one -a %%{5} -c %%{6} -n %%{7}}}	\
+-%{expand:%%{pesign -s -i %%{3}.orig -o %%{3}.one -a %%{5} -c %%{6} -n %%{7}}}	\
+-%{expand:%%{pesign -s -i %%{2}.one -o %%{2} -a %%{8} -c %%{9} -n %%{10}}}	\
+-%{expand:%%{pesign -s -i %%{3}.one -o %%{3} -a %%{8} -c %%{9} -n %%{10}}}	\
++%{expand:%%{pesign -s -i %%{2}.orig -o %%{2} -a %%{5} -c %%{6} -n %%{7}}}  \
++%{expand:%%{pesign -s -i %%{3}.orig -o %%{3} -a %%{5} -c %%{6} -n %%{7}}}  \
+ %{nil}
+ %else
+ %define efi_mkimage()						\
+diff --git a/SPECS/grub2.spec b/SPECS/grub2.spec
+index a5c909f..1c69532 100644
+--- a/SPECS/grub2.spec
++++ b/SPECS/grub2.spec
+@@ -32,6 +32,9 @@ Source17:	redhatsecureboot601.cer
+ Source18:	redhatsecureboot701.cer
+ Source19:	sbat.csv.in
+ 
++Source90000: openela-root-ca.cer
++Source90001: openela-grub2.cer
++
+ %include %{SOURCE1}
+ 
+ %if 0%{with_efi_arch}
+@@ -186,10 +189,10 @@ git commit -m "After making subdirs"
+ 
+ %build
+ %if 0%{with_efi_arch}
+-%{expand:%do_primary_efi_build %%{grubefiarch} %%{grubefiname} %%{grubeficdname} %%{_target_platform} %%{efi_target_cflags} %%{efi_host_cflags} %{old_sb_ca} %{old_sb_cer} %{old_sb_key} %{sb_ca} %{sb_cer} %{sb_key}}
++%{expand:%do_primary_efi_build %%{grubefiarch} %%{grubefiname} %%{grubeficdname} %%{_target_platform} %%{efi_target_cflags} %%{efi_host_cflags} %{SOURCE90000} %{SOURCE90001} openelabootsigningcert}
+ %endif
+ %if 0%{with_alt_efi_arch}
+-%{expand:%do_alt_efi_build %%{grubaltefiarch} %%{grubaltefiname} %%{grubalteficdname} %%{_alt_target_platform} %%{alt_efi_target_cflags} %%{alt_efi_host_cflags} %{old_sb_ca} %{old_sb_cer} %{old_sb_key} %{sb_ca} %{sb_cer} %{sb_key}}
++%{expand:%do_alt_efi_build %%{grubaltefiarch} %%{grubaltefiname} %%{grubalteficdname} %%{_alt_target_platform} %%{alt_efi_target_cflags} %%{alt_efi_host_cflags} %{SOURCE90000} %{SOURCE90001} openelabootsigningcert}
+ %endif
+ %if 0%{with_legacy_arch}
+ %{expand:%do_legacy_build %%{grublegacyarch}}
