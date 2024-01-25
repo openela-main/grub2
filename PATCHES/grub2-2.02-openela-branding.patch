@@ -1,0 +1,24 @@
+diff --git a/SOURCES/0063-Add-friendly-grub2-password-config-tool-985962.patch b/SOURCES/0063-Add-friendly-grub2-password-config-tool-985962.patch
+index 49ebfa7..555be1d 100644
+--- a/SOURCES/0063-Add-friendly-grub2-password-config-tool-985962.patch
++++ b/SOURCES/0063-Add-friendly-grub2-password-config-tool-985962.patch
+@@ -158,7 +158,7 @@ index 00000000000..dd76f00fc0e
+ +$0 prompts the user to set a password on the grub bootloader. The password
+ +is written to a file named user.cfg.
+ +
+-+Report bugs at https://bugzilla.redhat.com.
+++Report bugs at https://bugs.openela.org.
+ +EOF
+ +}
+ +
+diff --git a/SOURCES/0069-Clean-up-grub-setpassword-documentation-1290799.patch b/SOURCES/0069-Clean-up-grub-setpassword-documentation-1290799.patch
+index a405e88..d04168f 100644
+--- a/SOURCES/0069-Clean-up-grub-setpassword-documentation-1290799.patch
++++ b/SOURCES/0069-Clean-up-grub-setpassword-documentation-1290799.patch
+@@ -51,5 +51,5 @@ index fb9d3a3b6f9..c8c0fa4199d 100644
+ +  -v, --version                  print the version information and exit
+ +  -o, --output_path <DIRECTORY>  put user.cfg in a user-selected directory
+  
+- Report bugs at https://bugzilla.redhat.com.
++ Report bugs at https://bugs.openela.org.
+  EOF
