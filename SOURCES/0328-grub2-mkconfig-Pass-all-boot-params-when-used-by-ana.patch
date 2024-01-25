@@ -1,0 +1,37 @@
+From f4f134582912851628e15df4963b3b8a6652aa26 Mon Sep 17 00:00:00 2001
+From: Marta Lewandowska <mlewando@redhat.com>
+Date: Tue, 29 Aug 2023 16:40:47 +0200
+Subject: [PATCH] grub2-mkconfig: Pass all boot params when used by anaconda
+
+Previous patch makes it so that the machine can boot, but not all
+boot params are passed from /etc/default/grub to BLS snippets
+because /etc/default/grub gets written by anaconda during boot
+loader installation, long after grub rpms first got installed.
+
+Signed-off-by: Marta Lewandowska <mlewando@redhat.com>
+---
+ util/grub.d/10_linux.in | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/util/grub.d/10_linux.in b/util/grub.d/10_linux.in
+index 76fc21fb6528..041a11529588 100644
+--- a/util/grub.d/10_linux.in
++++ b/util/grub.d/10_linux.in
+@@ -265,9 +265,11 @@ if [ -z "\${kernelopts}" ]; then
+ fi
+ EOF
+ 
+-  if [ "x${GRUB_UPDATE_BLS_CMDLINE}" = "xyes" ] || \
+-	  ( [ -w /etc/kernel ] && [[ ! -f /etc/kernel/cmdline ]] && \
+-	  [ "x${GRUB_GRUBENV_UPDATE}" = "xyes" ] ); then
++  if [ "x${GRUB_UPDATE_BLS_CMDLINE}" = "xyes" ] || [[ -d /run/install ]]; then
++      # only update the bls cmdline if the user specifically requests it or _anytime_
++      # in the installer environment: /run/install directory only exists during the
++      # installation and not in cloud images, so this should get all the boot params
++      # from /etc/default/grub into BLS snippets
+       update_bls_cmdline
+   fi
+ 
+-- 
+2.41.0
+
