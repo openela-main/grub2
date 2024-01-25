@@ -1,0 +1,25 @@
+From 91ec701c449b002d300308013ea949d04c7bff63 Mon Sep 17 00:00:00 2001
+From: Louis Abel <label@rockylinux.org>
+Date: Tue, 11 Apr 2023 08:23:35 -0700
+Subject: [PATCH] change bugtracker
+
+---
+ .../0033-Add-friendly-grub2-password-config-tool-985962.patch   | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/SOURCES/0033-Add-friendly-grub2-password-config-tool-985962.patch b/SOURCES/0033-Add-friendly-grub2-password-config-tool-985962.patch
+index f430e96..5dabeeb 100644
+--- a/SOURCES/0033-Add-friendly-grub2-password-config-tool-985962.patch
++++ b/SOURCES/0033-Add-friendly-grub2-password-config-tool-985962.patch
+@@ -126,7 +126,7 @@ index 0000000000..5ebf50576d
+ +  -v, --version                  print the version information and exit
+ +  -o, --output_path <DIRECTORY>  put user.cfg in a user-selected directory
+ +
+-+Report bugs at https://bugzilla.redhat.com.
+++Report bugs at https://bugs.openela.org.
+ +EOF
+ +}
+ +
+-- 
+2.40.0
+
