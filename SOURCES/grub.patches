@@ -326,3 +326,4 @@ Patch0325: 0325-kern-ieee1275-init-Extended-support-in-Vec5.patch
 Patch0326: 0326-efi-http-change-uint32_t-to-uintn_t.patch
 Patch0327: 0327-grub-mkconfig-dont-overwrite-BLS-cmdline-if-BLSCFG.patch
 Patch0328: 0328-grub2-mkconfig-Pass-all-boot-params-when-used-by-ana.patch
+Patch0329: 0329-search-command-add-flag-to-only-search-root-dev.patch

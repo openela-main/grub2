@@ -16,7 +16,7 @@
 Name:                 grub2
 Epoch:                1
 Version:              2.06
-Release:              70%{?dist}.1.openela.0.2
+Release:              70%{?dist}.2.openela.0.2
 Summary:              Bootloader with support for Linux, Multiboot and more
 License:              GPLv3+
 URL:                  http://www.gnu.org/software/grub/
@@ -350,7 +350,7 @@ BOOT_UUID=$(%{name}-probe --target=fs_uuid ${GRUB_HOME})
 GRUB_DIR=$(%{name}-mkrelpath ${GRUB_HOME})
 
 cat << EOF > ${EFI_HOME}/grub.cfg.stb
-search --no-floppy --fs-uuid --set=dev ${BOOT_UUID}
+search --no-floppy --root-dev-only --fs-uuid --set=dev ${BOOT_UUID}
 set prefix=(\$dev)${GRUB_DIR}
 export \$prefix
 configfile \$prefix/grub.cfg
@@ -534,7 +534,7 @@ mv ${EFI_HOME}/grub.cfg.stb ${EFI_HOME}/grub.cfg
 %endif
 
 %changelog
-* Thu Jan 25 2024 Release Engineering <releng@openela.org> - 2.06.openela.0.2
+* Tue Mar 05 2024 Release Engineering <releng@openela.org> - 2.06.openela.0.2
 - Removing redhat old cert sources entries (Sherif Nagy)
 - Preserving rhel8 sbat entry based on shim-review feedback ticket no. 194
 - Adding prod cert
@@ -543,6 +543,11 @@ mv ${EFI_HOME}/grub.cfg.stb ${EFI_HOME}/grub.cfg
 - Cleaning up grup.macro extra signing certs
 - Adding OpenELA testing CA, CERT and sbat files
 - Use DER for ppc64le builds from openela-sb-certs (Louis Abel)
+
+* Thu Jan 4 2024 Nicolas Frayer <nfrayer@redhat.com> - 2.06-70.el9_3.2
+- search command: add flag to only search root dev
+  (CVE-2023-4001)
+- Resolves: #RHEL-20525
 
 * Thu Sep 7 2023 Nicolas Frayer <nfrayer@redhat.com> - 2.06-70.el9_3.1
 - Bump spec release version
