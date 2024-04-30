@@ -19,6 +19,9 @@ MACHINE_ID=$KERNEL_INSTALL_MACHINE_ID
 # If ${BOOT_DIR_ABS} exists, some other boot loader is active.
 [[ -d "${BOOT_DIR_ABS}" ]] && exit 0
 
+# UKIs are BLS type 2 entries, 90-uki-copy.install takes care of them
+[ "x$KERNEL_INSTALL_LAYOUT" != "xuki" ] || exit 0
+
 BLS_DIR="/boot/loader/entries"
 
 mkbls() {

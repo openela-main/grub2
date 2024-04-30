@@ -16,7 +16,7 @@
 Name:                 grub2
 Epoch:                1
 Version:              2.06
-Release:              70%{?dist}.2.openela.0.2
+Release:              77%{?dist}.openela.0.2
 Summary:              Bootloader with support for Linux, Multiboot and more
 License:              GPLv3+
 URL:                  http://www.gnu.org/software/grub/
@@ -534,7 +534,7 @@ mv ${EFI_HOME}/grub.cfg.stb ${EFI_HOME}/grub.cfg
 %endif
 
 %changelog
-* Tue Mar 05 2024 Release Engineering <releng@openela.org> - 2.06.openela.0.2
+* Tue Apr 30 2024 Release Engineering <releng@openela.org> - 2.06.openela.0.2
 - Removing redhat old cert sources entries (Sherif Nagy)
 - Preserving rhel8 sbat entry based on shim-review feedback ticket no. 194
 - Adding prod cert
@@ -544,22 +544,41 @@ mv ${EFI_HOME}/grub.cfg.stb ${EFI_HOME}/grub.cfg
 - Adding OpenELA testing CA, CERT and sbat files
 - Use DER for ppc64le builds from openela-sb-certs (Louis Abel)
 
-* Thu Jan 4 2024 Nicolas Frayer <nfrayer@redhat.com> - 2.06-70.el9_3.2
-- search command: add flag to only search root dev
-  (CVE-2023-4001)
-- Resolves: #RHEL-20525
+* Thu Feb 22 2024 Nicolas Frayer <nfrayer@redhat.com> - 2.06-77
+- kern/dl: grub_dl_set_mem_attrs()/grub_dl_load_segments() fixes
+- Resolves: #RHEL-26322
 
-* Thu Sep 7 2023 Nicolas Frayer <nfrayer@redhat.com> - 2.06-70.el9_3.1
-- Bump spec release version
-- Related: #2203203
-- Related: #2212320
-- Related: #2221543
+* Tue Feb 20 2024 Nicolas Frayer <nfrayer@redhat.com> - 2.06-76
+- fs/ntfs: OOB write fix
+- (CVE-2023-4692)
+- Resolves: #RHEL-11567
+
+* Wed Feb 7 2024 Nicolas Frayer <nfrayer@redhat.com> - 2.06-75
+- grub-set-bootflag: Fix for CVE-2024-1048
+- (CVE-2024-1048)
+- Resolves: #RHEL-20747
+
+* Mon Feb 5 2024 Nicolas Frayer <nfrayer@redhat.com> - 2.06-74
+- Don't run 20-grub.install for UKIs
+- Resolves: #RHEL-21368
+
+* Thu Jan 4 2024 Nicolas Frayer <nfrayer@redhat.com> - 2.06-73
+- search command: add flag to only search root dev
+- Resolves: #RHEL-20526
+- Resolves: #CVE-2023-4001
+
+* Thu Jan 4 2024 Nicolas Frayer <nfrayer@redhat.com> - 2.06-72
+- normal: Remove grub_env_set prefix in grub_try_normal_prefix
+- Resolves: #RHEL-1601
+
+* Thu Oct 19 2023 Nicolas Frayer <nfrayer@redhat.com> - 2.06-71
+- kern/ieee1275/init: ppc64: Restrict high memory in presence
+  of fadump
+- Resolves: #RHEL-14282
 
 * Tue Aug 29 2023 Nicolas Frayer <nfrayer@redhat.com> - 2.06-70
 - grub2-mkconfig: Pass all boot params when used by anaconda
-- Resolves: #2203203
-- Resolves: #2212320
-- Resolves: #2221543
+- Resolves: #RHEL-2185
 
 * Thu Aug 24 2023 Nicolas Frayer <nfrayer@redhat.com> - 2.06-69
 - grub2-mkconfig: dont overwrite BLS cmdline if BLSCFG is true
