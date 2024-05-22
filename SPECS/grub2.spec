@@ -7,7 +7,7 @@
 Name:                 grub2
 Epoch:                1
 Version:              2.02
-Release:              150%{?dist}.openela.0.3
+Release:              156%{?dist}.openela.0.3
 Summary:              Bootloader with support for Linux, Multiboot and more
 Group:                System Environment/Base
 License:              GPLv3+
@@ -508,7 +508,7 @@ fi
 %endif
 
 %changelog
-* Thu Jan 25 2024 Release Engineering <releng@openela.org> - 2.02.openela.0.3
+* Wed May 22 2024 Release Engineering <releng@openela.org> - 2.02.openela.0.3
 - Removing redhat old cert sources entries (Sherif Nagy)
 - Preserving rhel8 sbat entry based on shim-review feedback ticket no. 194
 - Adding prod cert
@@ -516,6 +516,33 @@ fi
 - Cleaning up grup.macro extra signing certs and updating openela test CA and CERT
 - Cleaning up grup.macro extra signing certs
 - Adding OpenELA testing CA, CERT and sbat files
+
+* Tue Feb 20 2024 Nicolas Frayer <nfrayer@redhat.com> - 2.02-156
+- fs/ntfs: OOB write fix
+- (CVE-2023-4692)
+- Resolves: #RHEL-11566
+
+* Thu Feb 8 2024 Nicolas Frayer <nfrayer@redhat.com> - 2.06-155
+- grub-set-bootflag: Fix for CVE-2024-1048
+- (CVE-2024-1048)
+- Resolves: #RHEL-20746
+
+* Mon Nov 27 2023 Nicolas Frayer <nfrayer@redhat.com> - 2.02-154
+- Missing install script for previous commit
+- Related: #RHEL-4343
+
+* Fri Nov 24 2023 Nicolas Frayer <nfrayer@redhat.com> - 2.02-153
+- util: Enable default kernel for updates
+- Resolves: #RHEL-4343
+
+* Fri Oct 20 2023 Nicolas Frayer <nfrayer@redhat.com> - 2.02-152
+- kern/ieee1275/init: ppc64: Restrict high memory in presence
+  of fadump
+- Resolves: #RHEL-14283
+
+* Mon Aug 28 2023 Nicolas Frayer <nfrayer@redhat.com> - 2.02-151
+- util: Regenerate kernelopts if missing on ppc
+- Resolves: #2051889
 
 * Fri Jun 16 2023 Nicolas Frayer <nfrayer@redhat.com> - 2.02-150
 - kern/ieee1275/init: sync vec5 patchset with upstream
