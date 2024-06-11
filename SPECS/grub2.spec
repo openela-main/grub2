@@ -16,7 +16,7 @@
 Name:                 grub2
 Epoch:                1
 Version:              2.06
-Release:              77%{?dist}.openela.0.2
+Release:              80%{?dist}.openela.0.2
 Summary:              Bootloader with support for Linux, Multiboot and more
 License:              GPLv3+
 URL:                  http://www.gnu.org/software/grub/
@@ -339,9 +339,11 @@ fi
 if test ! -f ${EFI_HOME}/grub.cfg; then
     # there's no config in ESP, create one
     grub2-mkconfig -o ${EFI_HOME}/grub.cfg
+    cp -a ${EFI_HOME}/grub.cfg ${EFI_HOME}/grub.cfg.rpmsave
+    cp -a ${EFI_HOME}/grub.cfg ${GRUB_HOME}/
 fi
 
-if grep -q "configfile" ${EFI_HOME}/grub.cfg; then
+if grep -q "configfile" ${EFI_HOME}/grub.cfg && grep -q "root-dev-only" ${EFI_HOME}/grub.cfg; then
     exit 0 # already unified, nothing to do
 fi
 
@@ -361,8 +363,6 @@ if test -f ${EFI_HOME}/grubenv; then
     mv --force ${EFI_HOME}/grubenv ${GRUB_HOME}/grubenv
 fi
 
-cp -a ${EFI_HOME}/grub.cfg ${EFI_HOME}/grub.cfg.rpmsave
-cp -a ${EFI_HOME}/grub.cfg ${GRUB_HOME}/
 mv ${EFI_HOME}/grub.cfg.stb ${EFI_HOME}/grub.cfg
 
 %files common -f grub.lang
@@ -534,7 +534,7 @@ mv ${EFI_HOME}/grub.cfg.stb ${EFI_HOME}/grub.cfg
 %endif
 
 %changelog
-* Tue Apr 30 2024 Release Engineering <releng@openela.org> - 2.06.openela.0.2
+* Tue Jun 11 2024 Release Engineering <releng@openela.org> - 2.06.openela.0.2
 - Removing redhat old cert sources entries (Sherif Nagy)
 - Preserving rhel8 sbat entry based on shim-review feedback ticket no. 194
 - Adding prod cert
@@ -543,6 +543,18 @@ mv ${EFI_HOME}/grub.cfg.stb ${EFI_HOME}/grub.cfg
 - Cleaning up grup.macro extra signing certs
 - Adding OpenELA testing CA, CERT and sbat files
 - Use DER for ppc64le builds from openela-sb-certs (Louis Abel)
+
+* Tue May 28 2024 Nicolas Frayer <nfrayer@redhat.com> - 2.06-80
+- Added more code for the previous CVE fix
+- Related: #RHEL-39405
+
+* Tue May 28 2024 Nicolas Frayer <nfrayer@redhat.com> - 2.06-79
+- cmd/search: Rework of CVE-2023-4001 fix
+- Resolves: #RHEL-39405
+
+* Thu Feb 22 2024 Nicolas Frayer <nfrayer@redhat.com> - 2.06-78
+- util: grub-install on EFI if forced
+- Resolves: #RHEL-20443
 
 * Thu Feb 22 2024 Nicolas Frayer <nfrayer@redhat.com> - 2.06-77
 - kern/dl: grub_dl_set_mem_attrs()/grub_dl_load_segments() fixes
