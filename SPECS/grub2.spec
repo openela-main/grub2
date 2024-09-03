@@ -16,7 +16,7 @@
 Name:                 grub2
 Epoch:                1
 Version:              2.06
-Release:              80%{?dist}.openela.0.2
+Release:              82%{?dist}.openela.0.2
 Summary:              Bootloader with support for Linux, Multiboot and more
 License:              GPLv3+
 URL:                  http://www.gnu.org/software/grub/
@@ -340,6 +340,10 @@ if test ! -f ${EFI_HOME}/grub.cfg; then
     # there's no config in ESP, create one
     grub2-mkconfig -o ${EFI_HOME}/grub.cfg
     cp -a ${EFI_HOME}/grub.cfg ${EFI_HOME}/grub.cfg.rpmsave
+fi
+
+# need to move grub.cfg to correct dir for major version upgrade
+if ! grep -q "configfile" ${EFI_HOME}/grub.cfg; then
     cp -a ${EFI_HOME}/grub.cfg ${GRUB_HOME}/
 fi
 
@@ -534,7 +538,7 @@ mv ${EFI_HOME}/grub.cfg.stb ${EFI_HOME}/grub.cfg
 %endif
 
 %changelog
-* Tue Jun 11 2024 Release Engineering <releng@openela.org> - 2.06.openela.0.2
+* Tue Sep 03 2024 Release Engineering <releng@openela.org> - 2.06.openela.0.2
 - Removing redhat old cert sources entries (Sherif Nagy)
 - Preserving rhel8 sbat entry based on shim-review feedback ticket no. 194
 - Adding prod cert
@@ -543,6 +547,14 @@ mv ${EFI_HOME}/grub.cfg.stb ${EFI_HOME}/grub.cfg
 - Cleaning up grup.macro extra signing certs
 - Adding OpenELA testing CA, CERT and sbat files
 - Use DER for ppc64le builds from openela-sb-certs (Louis Abel)
+
+* Thu Jun 27 2024 Nicolas Frayer <nfrayer@redhat.com> - 2.06-82
+- Bump to assign correct tag
+- Related: #RHEL-40362
+
+* Tue Jun 25 2024 Marta Lewandowska <mlewando@redhat.com> - 2.06-81
+- grub.cfg: Fix an issue when doing a major version upgrade
+- Resolves: #RHEL-40362
 
 * Tue May 28 2024 Nicolas Frayer <nfrayer@redhat.com> - 2.06-80
 - Added more code for the previous CVE fix
