@@ -7,7 +7,7 @@
 Name:                 grub2
 Epoch:                1
 Version:              2.02
-Release:              156%{?dist}.openela.0.3
+Release:              158%{?dist}.openela.0.3
 Summary:              Bootloader with support for Linux, Multiboot and more
 Group:                System Environment/Base
 License:              GPLv3+
@@ -308,6 +308,19 @@ if [ "$1" = 2 ]; then
 	/sbin/grub2-switch-to-blscfg --backup-suffix=.rpmsave &>/dev/null || :
 fi
 
+%posttrans common
+set -eu
+
+GRUB_HOME=/boot/%{name}
+
+if test  -f ${GRUB_HOME}/grub.cfg; then
+    # make sure GRUB_HOME/grub.cfg has 600 permissions
+    GRUB_CFG_MODE=$(stat --format="%a" ${GRUB_HOME}/grub.cfg)
+    if ! test "${GRUB_CFG_MODE}" = "600"; then
+        chmod 0600 ${GRUB_HOME}/grub.cfg
+    fi
+fi
+
 %triggerun -- grub2 < 1:1.99-4
 # grub2 < 1.99-4 removed a number of essential files in postun. To fix upgrades
 # from the affected grub2 packages, we first back up the files in triggerun and
@@ -508,7 +521,7 @@ fi
 %endif
 
 %changelog
-* Wed May 22 2024 Release Engineering <releng@openela.org> - 2.02.openela.0.3
+* Tue Nov 05 2024 Release Engineering <releng@openela.org> - 2.02.openela.0.3
 - Removing redhat old cert sources entries (Sherif Nagy)
 - Preserving rhel8 sbat entry based on shim-review feedback ticket no. 194
 - Adding prod cert
@@ -516,6 +529,14 @@ fi
 - Cleaning up grup.macro extra signing certs and updating openela test CA and CERT
 - Cleaning up grup.macro extra signing certs
 - Adding OpenELA testing CA, CERT and sbat files
+
+* Thu Sep 19 2024 Leo Sandoval <lsandova@redhat.com> - 2.02-158
+- grub-mkconfig.in: turn off executable owner bit
+- Resolves: #RHEL-58835
+
+* Wed Aug 14 2024 Leo Sandoval <lsandova@redhat.com> - 2.02-157
+- 20-grub-install: fix SELinux security type context for BLS
+- Resolves: #RHEL-4395
 
 * Tue Feb 20 2024 Nicolas Frayer <nfrayer@redhat.com> - 2.02-156
 - fs/ntfs: OOB write fix
