@@ -343,3 +343,9 @@ Patch0342: 0342-grub_dl_set_mem_attrs-add-self-check-for-the-tramp-G.patch
 Patch0343: 0343-grub_dl_load_segments-page-align-the-tramp-GOT-areas.patch
 Patch0344: 0344-grub-install-on-EFI-if-forced.patch
 Patch0345: 0345-cmd-search-Rework-of-CVE-2023-4001-fix.patch
+Patch0346: 0346-grub-mkconfig.in-turn-off-executable-owner-bit.patch
+Patch0347: 0347-grub2-mkconfig-Ensure-grub-cfg-stub-is-not-overwritt.patch
+Patch0348: 0348-chainloader-remove-device-path-debug-message.patch
+Patch0349: 0349-grub2-mkconfig-Simplify-os_name-detection.patch
+Patch0350: 0350-grub-mkconfig-Remove-check-for-mount-point-for-grub-.patch
+Patch0351: 0351-arm64-Use-proper-memory-type-for-kernel-allocation.patch

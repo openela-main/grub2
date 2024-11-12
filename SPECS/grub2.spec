@@ -16,7 +16,7 @@
 Name:                 grub2
 Epoch:                1
 Version:              2.06
-Release:              82%{?dist}.openela.0.2
+Release:              92%{?dist}.openela.0.2
 Summary:              Bootloader with support for Linux, Multiboot and more
 License:              GPLv3+
 URL:                  http://www.gnu.org/software/grub/
@@ -336,19 +336,29 @@ if ! mountpoint -q ${ESP_PATH}; then
     exit 0 # no ESP mounted, nothing to do
 fi
 
-if test ! -f ${EFI_HOME}/grub.cfg; then
-    # there's no config in ESP, create one
-    grub2-mkconfig -o ${EFI_HOME}/grub.cfg
-    cp -a ${EFI_HOME}/grub.cfg ${EFI_HOME}/grub.cfg.rpmsave
+if test ! -f ${GRUB_HOME}/grub.cfg; then
+    # there's no config in GRUB home, create one
+    grub2-mkconfig -o ${GRUB_HOME}/grub.cfg
+else
+    GRUB_CFG_MODE=$(stat --format="%a" ${GRUB_HOME}/grub.cfg)
+    if ! test "${GRUB_CFG_MODE}" = "600"; then
+        # when upgrading from <=2.06-90 to newer versions, the grub config stub
+        # may have different mode than 0600, so set the latter if this is the case
+        chmod 0600 ${GRUB_HOME}/grub.cfg
+    fi
 fi
 
-# need to move grub.cfg to correct dir for major version upgrade
-if ! grep -q "configfile" ${EFI_HOME}/grub.cfg; then
-    cp -a ${EFI_HOME}/grub.cfg ${GRUB_HOME}/
-fi
+# make sure grub.cfg is present before grepping it
+if test -f ${EFI_HOME}/grub.cfg; then
+    # need to move grub.cfg to correct dir for major version upgrade
+    if ! grep -q "configfile" ${EFI_HOME}/grub.cfg; then
+        cp -a ${EFI_HOME}/grub.cfg ${GRUB_HOME}/
+        chmod 0600 ${GRUB_HOME}/grub.cfg
+    fi
 
-if grep -q "configfile" ${EFI_HOME}/grub.cfg && grep -q "root-dev-only" ${EFI_HOME}/grub.cfg; then
-    exit 0 # already unified, nothing to do
+    if grep -q "configfile" ${EFI_HOME}/grub.cfg && grep -q "root-dev-only" ${EFI_HOME}/grub.cfg; then
+        exit 0 # already unified, nothing to do
+    fi
 fi
 
 # create a stub grub2 config in EFI
@@ -538,7 +548,7 @@ mv ${EFI_HOME}/grub.cfg.stb ${EFI_HOME}/grub.cfg
 %endif
 
 %changelog
-* Tue Sep 03 2024 Release Engineering <releng@openela.org> - 2.06.openela.0.2
+* Tue Nov 12 2024 Release Engineering <releng@openela.org> - 2.06.openela.0.2
 - Removing redhat old cert sources entries (Sherif Nagy)
 - Preserving rhel8 sbat entry based on shim-review feedback ticket no. 194
 - Adding prod cert
@@ -548,21 +558,63 @@ mv ${EFI_HOME}/grub.cfg.stb ${EFI_HOME}/grub.cfg
 - Adding OpenELA testing CA, CERT and sbat files
 - Use DER for ppc64le builds from openela-sb-certs (Louis Abel)
 
+* Tue Aug 13 2024 Nicolas Frayer <nfrayer@redhat.com> - 2.06-92
+- arm64/linux: Allocate memory for kernel with EFI_LOADER_CODE type
+- Resolves: #RHEL-49868
+
+* Fri Aug 2 2024 Leo Sandoval <lsandova@redhat.com> - 2.06-91
+- Set /boot/grub2/grub.cfg to 0600 mode if present
+- Resolves: #RHEL-45870
+
+* Thu Aug 1 2024 Nicolas Frayer <nfrayer@redhat.com> - 2.06-90
+- grub2-mkconfig: Remove mountpoint check
+- Related: #RHEL-32099
+
+* Thu Aug 1 2024 Leo Sandoval <lsandova@redhat.com> - 2.06-89
+- Bump release number
+- Resolves: #RHEL-45870
+
+* Wed Jul 31 2024 Leo Sandoval <lsandova@redhat.com> - 2.06-88
+- grub.cfg: Fix rpm grub.cfg verification issues
+- Resolves: #RHEL-45870
+
+* Wed Jul 31 2024 Andrew Lukoshko <alukoshko@almalinux.org> - 2.06-87
+- grub2-mkconfig: Simplify os_name detection
+- Resolves: #RHEL-32099
+
+* Tue Jul 16 2024 Nicolas Frayer <nfrayer@redhat.com> - 2.06-86
+- chainloader: Remove unexpected "/EndEntire"
+- Resolves: #RHEL-4380
+
+* Tue Jul 16 2024 Nicolas Frayer <nfrayer@redhat.com> - 2.06-85
+- grub2-mkconfig: Prevent mkconfig from overwriting grub cfg stub
+- Resolves: #RHEL-32099
+
+* Thu Jul 11 2024 Nicolas Frayer <nfrayer@redhat.com> - 2.06-84
+- install/ppc64le: run grub2-mkconfig regardless of petitboot version
+- Resolves: #RHEL-45161
+
+* Mon Jul 1 2024 Leo Sandoval <lsandova@redhat.com> - 2.06-83
+- grub-mkconfig.in: turn off executable owner bit
+- Resolves: RHEL-45870
+
 * Thu Jun 27 2024 Nicolas Frayer <nfrayer@redhat.com> - 2.06-82
-- Bump to assign correct tag
-- Related: #RHEL-40362
+- mkconfig/install: Remove BLS handling for XEN
+- Resolves: #RHEL-4386
 
 * Tue Jun 25 2024 Marta Lewandowska <mlewando@redhat.com> - 2.06-81
 - grub.cfg: Fix an issue when doing a major version upgrade
-- Resolves: #RHEL-40362
+- Resolves: #RHEL-45008
 
 * Tue May 28 2024 Nicolas Frayer <nfrayer@redhat.com> - 2.06-80
 - Added more code for the previous CVE fix
-- Related: #RHEL-39405
+- Related: #RHEL-36249
+- Related: #RHEL-36186
 
 * Tue May 28 2024 Nicolas Frayer <nfrayer@redhat.com> - 2.06-79
 - cmd/search: Rework of CVE-2023-4001 fix
-- Resolves: #RHEL-39405
+- Resolves: #RHEL-36249
+- Resolves: #RHEL-36186
 
 * Thu Feb 22 2024 Nicolas Frayer <nfrayer@redhat.com> - 2.06-78
 - util: grub-install on EFI if forced
