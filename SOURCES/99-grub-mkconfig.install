@@ -9,16 +9,22 @@ ARCH=$(uname -m)
 [[ -f /etc/default/grub ]] && . /etc/default/grub
 
 # Can't assume a BLS capable bootloader on ppc64
-if [[ x$GRUB_ENABLE_BLSCFG != xfalse &&
+if [[ x$GRUB_ENABLE_BLSCFG = xtrue &&
 	  $ARCH != "ppc64" && $ARCH != "ppc64le" ]]; then
     exit 0
 fi
 
 COMMAND="$1"
 
+grub_cfg=/boot/grub2/grub.cfg
+if mountpoint -q /boot/efi; then
+    os_name=$(grep ^ID= /etc/os-release | sed -e 's/^ID=//' -e 's/rhel/redhat/' -e 's/\"//g')
+    grub_cfg=/boot/efi/EFI/$os_name/grub.cfg
+fi
+
 case "$COMMAND" in
     add|remove)
-        grub2-mkconfig --no-grubenv-update -o /boot/grub2/grub.cfg >& /dev/null
+        grub2-mkconfig --no-grubenv-update -o $grub_cfg >& /dev/null
         ;;
     *)
         ;;
