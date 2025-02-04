@@ -349,3 +349,4 @@ Patch0348: 0348-chainloader-remove-device-path-debug-message.patch
 Patch0349: 0349-grub2-mkconfig-Simplify-os_name-detection.patch
 Patch0350: 0350-grub-mkconfig-Remove-check-for-mount-point-for-grub-.patch
 Patch0351: 0351-arm64-Use-proper-memory-type-for-kernel-allocation.patch
+Patch0352: 0352-cmd-search-Fix-a-possible-NULL-ptr-dereference.patch
