@@ -1,0 +1,45 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Leo Sandoval <lsandova@redhat.com>
+Date: Sat, 15 Feb 2025 20:11:42 -0600
+Subject: [PATCH] Remove exttra bool definitions
+
+Previous commit 'types: Make bool generally available' make this type available
+so no need to redefined it.
+
+Signed-off-by: Leo Sandoval <lsandova@redhat.com>
+---
+ grub-core/lib/posix_wrap/sys/types.h | 5 -----
+ grub-core/lib/xzembed/xz.h           | 4 ----
+ 2 files changed, 9 deletions(-)
+
+diff --git a/grub-core/lib/posix_wrap/sys/types.h b/grub-core/lib/posix_wrap/sys/types.h
+index f63412c8d..2cd36d081 100644
+--- a/grub-core/lib/posix_wrap/sys/types.h
++++ b/grub-core/lib/posix_wrap/sys/types.h
+@@ -24,11 +24,6 @@
+ #include <stddef.h>
+ 
+ typedef grub_ssize_t ssize_t;
+-#ifndef GRUB_POSIX_BOOL_DEFINED
+-typedef enum { false = 0, true = 1 } bool;
+-#define GRUB_POSIX_BOOL_DEFINED 1
+-#endif
+-
+ typedef grub_uint8_t uint8_t;
+ typedef grub_uint16_t uint16_t;
+ typedef grub_uint32_t uint32_t;
+diff --git a/grub-core/lib/xzembed/xz.h b/grub-core/lib/xzembed/xz.h
+index fe7158bb2..0265c4a6d 100644
+--- a/grub-core/lib/xzembed/xz.h
++++ b/grub-core/lib/xzembed/xz.h
+@@ -29,10 +29,6 @@
+ #include <string.h>
+ #include <grub/misc.h>
+ 
+-#ifndef GRUB_POSIX_BOOL_DEFINED
+-typedef enum { false = 0, true = 1 } bool;
+-#endif
+-
+ /**
+  * enum xz_ret - Return codes
+  * @XZ_OK:              Everything is OK so far. More input or more output

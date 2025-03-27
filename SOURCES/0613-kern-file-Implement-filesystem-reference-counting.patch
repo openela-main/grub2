@@ -1,0 +1,430 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: B Horn <b@horn.uk>
+Date: Sun, 12 May 2024 10:15:03 +0100
+Subject: [PATCH] kern/file: Implement filesystem reference counting
+
+The grub_file_open() and grub_file_close() should be the only places
+that allow a reference to a filesystem to stay open. So, add grub_dl_t
+to grub_fs_t and set this in the GRUB_MOD_INIT() for each filesystem to
+avoid issues when filesystems forget to do it themselves or do not track
+their own references, e.g. squash4.
+
+The fs_label(), fs_uuid(), fs_mtime() and fs_read() should all ref and
+unref in the same function but it is essentially redundant in GRUB
+single threaded model.
+
+Signed-off-by: B Horn <b@horn.uk>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/fs/affs.c     | 1 +
+ grub-core/fs/bfs.c      | 1 +
+ grub-core/fs/btrfs.c    | 1 +
+ grub-core/fs/cbfs.c     | 1 +
+ grub-core/fs/cpio.c     | 1 +
+ grub-core/fs/cpio_be.c  | 1 +
+ grub-core/fs/ext2.c     | 1 +
+ grub-core/fs/f2fs.c     | 1 +
+ grub-core/fs/fat.c      | 1 +
+ grub-core/fs/hfs.c      | 1 +
+ grub-core/fs/hfsplus.c  | 1 +
+ grub-core/fs/iso9660.c  | 1 +
+ grub-core/fs/jfs.c      | 1 +
+ grub-core/fs/minix.c    | 1 +
+ grub-core/fs/newc.c     | 1 +
+ grub-core/fs/nilfs2.c   | 1 +
+ grub-core/fs/ntfs.c     | 1 +
+ grub-core/fs/odc.c      | 1 +
+ grub-core/fs/proc.c     | 1 +
+ grub-core/fs/reiserfs.c | 1 +
+ grub-core/fs/romfs.c    | 1 +
+ grub-core/fs/sfs.c      | 1 +
+ grub-core/fs/squash4.c  | 1 +
+ grub-core/fs/tar.c      | 1 +
+ grub-core/fs/udf.c      | 1 +
+ grub-core/fs/ufs.c      | 1 +
+ grub-core/fs/xfs.c      | 1 +
+ grub-core/fs/zfs/zfs.c  | 1 +
+ grub-core/kern/file.c   | 4 ++++
+ include/grub/fs.h       | 4 ++++
+ 30 files changed, 36 insertions(+)
+
+diff --git a/grub-core/fs/affs.c b/grub-core/fs/affs.c
+index e4615c743..6347ca368 100644
+--- a/grub-core/fs/affs.c
++++ b/grub-core/fs/affs.c
+@@ -699,6 +699,7 @@ static struct grub_fs grub_affs_fs =
+ 
+ GRUB_MOD_INIT(affs)
+ {
++  grub_affs_fs.mod = mod;
+   grub_fs_register (&grub_affs_fs);
+   my_mod = mod;
+ }
+diff --git a/grub-core/fs/bfs.c b/grub-core/fs/bfs.c
+index d2b490bce..6afdfc987 100644
+--- a/grub-core/fs/bfs.c
++++ b/grub-core/fs/bfs.c
+@@ -1104,6 +1104,7 @@ GRUB_MOD_INIT (bfs)
+ {
+   COMPILE_TIME_ASSERT (1 << LOG_EXTENT_SIZE ==
+ 		       sizeof (struct grub_bfs_extent));
++  grub_bfs_fs.mod = mod;
+   grub_fs_register (&grub_bfs_fs);
+ }
+ 
+diff --git a/grub-core/fs/btrfs.c b/grub-core/fs/btrfs.c
+index 9da2952f7..65213549e 100644
+--- a/grub-core/fs/btrfs.c
++++ b/grub-core/fs/btrfs.c
+@@ -2802,6 +2802,7 @@ subvol_get_env (struct grub_env_var *var __attribute__ ((unused)),
+ 
+ GRUB_MOD_INIT (btrfs)
+ {
++  grub_btrfs_fs.mod = mod;
+   grub_fs_register (&grub_btrfs_fs);
+   cmd_info = grub_register_command("btrfs-info", grub_cmd_btrfs_info,
+ 				   "DEVICE",
+diff --git a/grub-core/fs/cbfs.c b/grub-core/fs/cbfs.c
+index 0842701a6..395edcbbd 100644
+--- a/grub-core/fs/cbfs.c
++++ b/grub-core/fs/cbfs.c
+@@ -390,6 +390,7 @@ GRUB_MOD_INIT (cbfs)
+ #if (defined (__i386__) || defined (__x86_64__)) && !defined (GRUB_UTIL) && !defined (GRUB_MACHINE_EMU) && !defined (GRUB_MACHINE_XEN)
+   init_cbfsdisk ();
+ #endif
++  grub_cbfs_fs.mod = mod;
+   grub_fs_register (&grub_cbfs_fs);
+ }
+ 
+diff --git a/grub-core/fs/cpio.c b/grub-core/fs/cpio.c
+index dab5f9898..1799f7ff5 100644
+--- a/grub-core/fs/cpio.c
++++ b/grub-core/fs/cpio.c
+@@ -52,6 +52,7 @@ read_number (const grub_uint16_t *arr, grub_size_t size)
+ 
+ GRUB_MOD_INIT (cpio)
+ {
++  grub_cpio_fs.mod = mod;
+   grub_fs_register (&grub_cpio_fs);
+ }
+ 
+diff --git a/grub-core/fs/cpio_be.c b/grub-core/fs/cpio_be.c
+index 846548892..7bed1b848 100644
+--- a/grub-core/fs/cpio_be.c
++++ b/grub-core/fs/cpio_be.c
+@@ -52,6 +52,7 @@ read_number (const grub_uint16_t *arr, grub_size_t size)
+ 
+ GRUB_MOD_INIT (cpio_be)
+ {
++  grub_cpio_fs.mod = mod;
+   grub_fs_register (&grub_cpio_fs);
+ }
+ 
+diff --git a/grub-core/fs/ext2.c b/grub-core/fs/ext2.c
+index de5c268a9..dc62a6cfe 100644
+--- a/grub-core/fs/ext2.c
++++ b/grub-core/fs/ext2.c
+@@ -1105,6 +1105,7 @@ static struct grub_fs grub_ext2_fs =
+ 
+ GRUB_MOD_INIT(ext2)
+ {
++  grub_ext2_fs.mod = mod;
+   grub_fs_register (&grub_ext2_fs);
+   my_mod = mod;
+ }
+diff --git a/grub-core/fs/f2fs.c b/grub-core/fs/f2fs.c
+index 706e595d3..149f33695 100644
+--- a/grub-core/fs/f2fs.c
++++ b/grub-core/fs/f2fs.c
+@@ -1339,6 +1339,7 @@ static struct grub_fs grub_f2fs_fs = {
+ 
+ GRUB_MOD_INIT (f2fs)
+ {
++  grub_f2fs_fs.mod = mod;
+   grub_fs_register (&grub_f2fs_fs);
+   my_mod = mod;
+ }
+diff --git a/grub-core/fs/fat.c b/grub-core/fs/fat.c
+index 8d8dc35ce..72785a798 100644
+--- a/grub-core/fs/fat.c
++++ b/grub-core/fs/fat.c
+@@ -1254,6 +1254,7 @@ GRUB_MOD_INIT(fat)
+ #endif
+ {
+   COMPILE_TIME_ASSERT (sizeof (struct grub_fat_dir_entry) == 32);
++  grub_fat_fs.mod = mod;
+   grub_fs_register (&grub_fat_fs);
+   my_mod = mod;
+ }
+diff --git a/grub-core/fs/hfs.c b/grub-core/fs/hfs.c
+index 44859fe43..66b9fca83 100644
+--- a/grub-core/fs/hfs.c
++++ b/grub-core/fs/hfs.c
+@@ -1434,6 +1434,7 @@ static struct grub_fs grub_hfs_fs =
+ 
+ GRUB_MOD_INIT(hfs)
+ {
++  grub_hfs_fs.mod = mod;
+   if (!grub_is_lockdown ())
+     grub_fs_register (&grub_hfs_fs);
+   my_mod = mod;
+diff --git a/grub-core/fs/hfsplus.c b/grub-core/fs/hfsplus.c
+index 2edb1649d..a1805eed0 100644
+--- a/grub-core/fs/hfsplus.c
++++ b/grub-core/fs/hfsplus.c
+@@ -1139,6 +1139,7 @@ static struct grub_fs grub_hfsplus_fs =
+ 
+ GRUB_MOD_INIT(hfsplus)
+ {
++  grub_hfsplus_fs.mod = mod;
+   grub_fs_register (&grub_hfsplus_fs);
+   my_mod = mod;
+ }
+diff --git a/grub-core/fs/iso9660.c b/grub-core/fs/iso9660.c
+index cf17702e2..576505535 100644
+--- a/grub-core/fs/iso9660.c
++++ b/grub-core/fs/iso9660.c
+@@ -1165,6 +1165,7 @@ static struct grub_fs grub_iso9660_fs =
+ 
+ GRUB_MOD_INIT(iso9660)
+ {
++  grub_iso9660_fs.mod = mod;
+   grub_fs_register (&grub_iso9660_fs);
+   my_mod = mod;
+ }
+diff --git a/grub-core/fs/jfs.c b/grub-core/fs/jfs.c
+index 739b3c540..46941248b 100644
+--- a/grub-core/fs/jfs.c
++++ b/grub-core/fs/jfs.c
+@@ -998,6 +998,7 @@ static struct grub_fs grub_jfs_fs =
+ 
+ GRUB_MOD_INIT(jfs)
+ {
++  grub_jfs_fs.mod = mod;
+   grub_fs_register (&grub_jfs_fs);
+   my_mod = mod;
+ }
+diff --git a/grub-core/fs/minix.c b/grub-core/fs/minix.c
+index d451b3426..28571c49e 100644
+--- a/grub-core/fs/minix.c
++++ b/grub-core/fs/minix.c
+@@ -716,6 +716,7 @@ GRUB_MOD_INIT(minix)
+ #endif
+ #endif
+ {
++  grub_minix_fs.mod = mod;
+   grub_fs_register (&grub_minix_fs);
+   my_mod = mod;
+ }
+diff --git a/grub-core/fs/newc.c b/grub-core/fs/newc.c
+index 4fb8b2e3d..43b7f8b64 100644
+--- a/grub-core/fs/newc.c
++++ b/grub-core/fs/newc.c
+@@ -64,6 +64,7 @@ read_number (const char *str, grub_size_t size)
+ 
+ GRUB_MOD_INIT (newc)
+ {
++  grub_cpio_fs.mod = mod;
+   grub_fs_register (&grub_cpio_fs);
+ }
+ 
+diff --git a/grub-core/fs/nilfs2.c b/grub-core/fs/nilfs2.c
+index c4c4610be..3c1e4d1f6 100644
+--- a/grub-core/fs/nilfs2.c
++++ b/grub-core/fs/nilfs2.c
+@@ -1231,6 +1231,7 @@ GRUB_MOD_INIT (nilfs2)
+ 				  grub_nilfs2_dat_entry));
+   COMPILE_TIME_ASSERT (1 << LOG_INODE_SIZE
+ 		       == sizeof (struct grub_nilfs2_inode));
++  grub_nilfs2_fs.mod = mod;
+   grub_fs_register (&grub_nilfs2_fs);
+   my_mod = mod;
+ }
+diff --git a/grub-core/fs/ntfs.c b/grub-core/fs/ntfs.c
+index 86222413c..9244e95dd 100644
+--- a/grub-core/fs/ntfs.c
++++ b/grub-core/fs/ntfs.c
+@@ -1537,6 +1537,7 @@ static struct grub_fs grub_ntfs_fs =
+ 
+ GRUB_MOD_INIT (ntfs)
+ {
++  grub_ntfs_fs.mod = mod;
+   grub_fs_register (&grub_ntfs_fs);
+   my_mod = mod;
+ }
+diff --git a/grub-core/fs/odc.c b/grub-core/fs/odc.c
+index 790000622..8e4e8aeac 100644
+--- a/grub-core/fs/odc.c
++++ b/grub-core/fs/odc.c
+@@ -52,6 +52,7 @@ read_number (const char *str, grub_size_t size)
+ 
+ GRUB_MOD_INIT (odc)
+ {
++  grub_cpio_fs.mod = mod;
+   grub_fs_register (&grub_cpio_fs);
+ }
+ 
+diff --git a/grub-core/fs/proc.c b/grub-core/fs/proc.c
+index 31f3aa9a4..317118b81 100644
+--- a/grub-core/fs/proc.c
++++ b/grub-core/fs/proc.c
+@@ -192,6 +192,7 @@ static struct grub_fs grub_procfs_fs =
+ 
+ GRUB_MOD_INIT (procfs)
+ {
++  grub_procfs_fs.mod = mod;
+   grub_disk_dev_register (&grub_procfs_dev);
+   grub_fs_register (&grub_procfs_fs);
+ }
+diff --git a/grub-core/fs/reiserfs.c b/grub-core/fs/reiserfs.c
+index 9556c15ff..e65b81467 100644
+--- a/grub-core/fs/reiserfs.c
++++ b/grub-core/fs/reiserfs.c
+@@ -1407,6 +1407,7 @@ static struct grub_fs grub_reiserfs_fs =
+ 
+ GRUB_MOD_INIT(reiserfs)
+ {
++  grub_reiserfs_fs.mod = mod;
+   grub_fs_register (&grub_reiserfs_fs);
+   my_mod = mod;
+ }
+diff --git a/grub-core/fs/romfs.c b/grub-core/fs/romfs.c
+index 2e3544408..f282cff86 100644
+--- a/grub-core/fs/romfs.c
++++ b/grub-core/fs/romfs.c
+@@ -475,6 +475,7 @@ static struct grub_fs grub_romfs_fs =
+ 
+ GRUB_MOD_INIT(romfs)
+ {
++  grub_romfs_fs.mod = mod;
+   grub_fs_register (&grub_romfs_fs);
+ }
+ 
+diff --git a/grub-core/fs/sfs.c b/grub-core/fs/sfs.c
+index 61d6c303c..c6b9fb49a 100644
+--- a/grub-core/fs/sfs.c
++++ b/grub-core/fs/sfs.c
+@@ -779,6 +779,7 @@ static struct grub_fs grub_sfs_fs =
+ 
+ GRUB_MOD_INIT(sfs)
+ {
++  grub_sfs_fs.mod = mod;
+   grub_fs_register (&grub_sfs_fs);
+   my_mod = mod;
+ }
+diff --git a/grub-core/fs/squash4.c b/grub-core/fs/squash4.c
+index f9bef38fc..1505832d5 100644
+--- a/grub-core/fs/squash4.c
++++ b/grub-core/fs/squash4.c
+@@ -1032,6 +1032,7 @@ static struct grub_fs grub_squash_fs =
+ 
+ GRUB_MOD_INIT(squash4)
+ {
++  grub_squash_fs.mod = mod;
+   grub_fs_register (&grub_squash_fs);
+ }
+ 
+diff --git a/grub-core/fs/tar.c b/grub-core/fs/tar.c
+index 28baa5845..01738ec55 100644
+--- a/grub-core/fs/tar.c
++++ b/grub-core/fs/tar.c
+@@ -354,6 +354,7 @@ static struct grub_fs grub_cpio_fs = {
+ 
+ GRUB_MOD_INIT (tar)
+ {
++  grub_cpio_fs.mod = mod;
+   grub_fs_register (&grub_cpio_fs);
+ }
+ 
+diff --git a/grub-core/fs/udf.c b/grub-core/fs/udf.c
+index 6670beb56..8db2b5686 100644
+--- a/grub-core/fs/udf.c
++++ b/grub-core/fs/udf.c
+@@ -1382,6 +1382,7 @@ static struct grub_fs grub_udf_fs = {
+ 
+ GRUB_MOD_INIT (udf)
+ {
++  grub_udf_fs.mod = mod;
+   grub_fs_register (&grub_udf_fs);
+   my_mod = mod;
+ }
+diff --git a/grub-core/fs/ufs.c b/grub-core/fs/ufs.c
+index 0c2004fd7..a2c63d646 100644
+--- a/grub-core/fs/ufs.c
++++ b/grub-core/fs/ufs.c
+@@ -899,6 +899,7 @@ GRUB_MOD_INIT(ufs1)
+ #endif
+ #endif
+ {
++  grub_ufs_fs.mod = mod;
+   grub_fs_register (&grub_ufs_fs);
+   my_mod = mod;
+ }
+diff --git a/grub-core/fs/xfs.c b/grub-core/fs/xfs.c
+index c9818a96a..5b7643eb1 100644
+--- a/grub-core/fs/xfs.c
++++ b/grub-core/fs/xfs.c
+@@ -1167,6 +1167,7 @@ static struct grub_fs grub_xfs_fs =
+ 
+ GRUB_MOD_INIT(xfs)
+ {
++  grub_xfs_fs.mod = mod;
+   grub_fs_register (&grub_xfs_fs);
+   my_mod = mod;
+ }
+diff --git a/grub-core/fs/zfs/zfs.c b/grub-core/fs/zfs/zfs.c
+index 0d8c08eec..0c4b15f08 100644
+--- a/grub-core/fs/zfs/zfs.c
++++ b/grub-core/fs/zfs/zfs.c
+@@ -4391,6 +4391,7 @@ static struct grub_fs grub_zfs_fs = {
+ GRUB_MOD_INIT (zfs)
+ {
+   COMPILE_TIME_ASSERT (sizeof (zap_leaf_chunk_t) == ZAP_LEAF_CHUNKSIZE);
++  grub_zfs_fs.mod = mod;
+   grub_fs_register (&grub_zfs_fs);
+ #ifndef GRUB_UTIL
+   my_mod = mod;
+diff --git a/grub-core/kern/file.c b/grub-core/kern/file.c
+index 596f16ced..7e64609d4 100644
+--- a/grub-core/kern/file.c
++++ b/grub-core/kern/file.c
+@@ -25,6 +25,7 @@
+ #include <grub/fs.h>
+ #include <grub/device.h>
+ #include <grub/i18n.h>
++#include <grub/dl.h>
+ 
+ void (*EXPORT_VAR (grub_grubnet_fini)) (void);
+ 
+@@ -124,6 +125,9 @@ grub_file_open (const char *name, enum grub_file_type type)
+   if (file->data == NULL)
+     goto fail;
+ 
++  if (file->fs->mod)
++    grub_dl_ref (file->fs->mod);
++
+   file->name = grub_strdup (name);
+   grub_errno = GRUB_ERR_NONE;
+ 
+diff --git a/include/grub/fs.h b/include/grub/fs.h
+index 5678c60c2..cb1040b50 100644
+--- a/include/grub/fs.h
++++ b/include/grub/fs.h
+@@ -23,6 +23,7 @@
+ #include <grub/device.h>
+ #include <grub/symbol.h>
+ #include <grub/types.h>
++#include <grub/dl.h>
+ 
+ #include <grub/list.h>
+ /* For embedding types.  */
+@@ -57,6 +58,9 @@ struct grub_fs
+   /* My name.  */
+   const char *name;
+ 
++  /* My module */
++  grub_dl_t mod;
++
+   /* Call HOOK with each file under DIR.  */
+   grub_err_t (*dir) (grub_device_t device, const char *path,
+ 		     grub_fs_dir_hook_t hook, void *hook_data);
