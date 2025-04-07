@@ -663,3 +663,13 @@ Patch0663: 0663-types-Make-bool-generally-available.patch
 Patch0664: 0664-Remove-exttra-bool-definitions.patch
 Patch0665: 0665-fs-xfs-Fix-issues-found-while-fuzzing-the-XFS-filesy.patch
 Patch0666: 0666-ieee1275-ofnet-Fix-grub_malloc-removed-after-added-s.patch
+Patch0667: 0667-fs-xfs-Add-bigtime-incompat-feature-support.patch
+Patch0668: 0668-fs-xfs-Add-needsrepair-incompat-feature-support.patch
+Patch0669: 0669-fs-xfs-Fix-unreadable-filesystem-with-v4-superblock.patch
+Patch0670: 0670-fs-Remove-trailing-whitespaces.patch
+Patch0671: 0671-fs-xfs-Fix-memory-leaks-in-XFS-module.patch
+Patch0672: 0672-fs-xfs-Incorrect-short-form-directory-data-boundary-.patch
+Patch0673: 0673-fs-xfs-Fix-XFS-directory-extent-parsing.patch
+Patch0674: 0674-fs-xfs-Add-large-extent-counters-incompat-feature-su.patch
+Patch0675: 0675-fs-xfs-Handle-non-continuous-data-blocks-in-director.patch
+Patch0676: 0676-fs-xfs-fix-large-extent-counters-incompat-feature-su.patch

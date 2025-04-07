@@ -1,0 +1,81 @@
+From b03ffdb85eca0a5a632c6c5bbeea52373d2fea69 Mon Sep 17 00:00:00 2001
+From: Javier Martinez Canillas <javierm@redhat.com>
+Date: Mon, 24 May 2021 19:40:07 +0200
+Subject: [PATCH 668/668] fs/xfs: Add needsrepair incompat feature support
+
+The XFS now has an incompat feature flag to indicate that a filesystem
+needs to be repaired. The Linux kernel refuses to mount the filesystem
+that has it set and only the xfs_repair tool is able to clear that flag.
+
+The GRUB doesn't have the concept of mounting filesystems and just
+attempts to read the files. But it does some sanity checking before
+attempting to read from the filesystem. Among the things which are tested,
+is if the super block only has set of incompatible features flags that
+are supported by GRUB. If it contains any flags that are not listed as
+supported, reading the XFS filesystem fails.
+
+Since the GRUB doesn't attempt to detect if the filesystem is inconsistent
+nor replays the journal, the filesystem access is a best effort. For this
+reason, ignore if the filesystem needs to be repaired and just print a debug
+message. That way, if reading or booting fails later, the user is able to
+figure out that the failures can be related to broken XFS filesystem.
+
+Suggested-by: Eric Sandeen <esandeen@redhat.com>
+Signed-off-by: Javier Martinez Canillas <javierm@redhat.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/fs/xfs.c | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
+
+diff --git a/grub-core/fs/xfs.c b/grub-core/fs/xfs.c
+index 8c23944..f113216 100644
+--- a/grub-core/fs/xfs.c
++++ b/grub-core/fs/xfs.c
+@@ -85,6 +85,7 @@ GRUB_MOD_LICENSE ("GPLv3+");
+ #define XFS_SB_FEAT_INCOMPAT_SPINODES   (1 << 1)        /* sparse inode chunks */
+ #define XFS_SB_FEAT_INCOMPAT_META_UUID  (1 << 2)        /* metadata UUID */
+ #define XFS_SB_FEAT_INCOMPAT_BIGTIME    (1 << 3)        /* large timestamps */
++#define XFS_SB_FEAT_INCOMPAT_NEEDSREPAIR (1 << 4)       /* needs xfs_repair */
+ 
+ /*
+  * Directory entries with ftype are explicitly handled by GRUB code.
+@@ -99,7 +100,8 @@ GRUB_MOD_LICENSE ("GPLv3+");
+ 	(XFS_SB_FEAT_INCOMPAT_FTYPE | \
+ 	 XFS_SB_FEAT_INCOMPAT_SPINODES | \
+ 	 XFS_SB_FEAT_INCOMPAT_META_UUID | \
+-	 XFS_SB_FEAT_INCOMPAT_BIGTIME)
++	 XFS_SB_FEAT_INCOMPAT_BIGTIME | \
++	 XFS_SB_FEAT_INCOMPAT_NEEDSREPAIR)
+ 
+ struct grub_xfs_sblock
+ {
+@@ -313,6 +315,16 @@ static int grub_xfs_sb_valid(struct grub_xfs_data *data)
+   return 0;
+ }
+ 
++static int
++grub_xfs_sb_needs_repair (struct grub_xfs_data *data)
++{
++  return ((data->sblock.version &
++           grub_cpu_to_be16_compile_time (XFS_SB_VERSION_NUMBITS)) ==
++          grub_cpu_to_be16_compile_time (XFS_SB_VERSION_5) &&
++          (data->sblock.sb_features_incompat &
++           grub_cpu_to_be32_compile_time (XFS_SB_FEAT_INCOMPAT_NEEDSREPAIR)));
++}
++
+ /* Filetype information as used in inodes.  */
+ #define FILETYPE_INO_MASK	0170000
+ #define FILETYPE_INO_REG	0100000
+@@ -975,6 +987,9 @@ grub_xfs_mount (grub_disk_t disk)
+   if (!grub_xfs_sb_valid(data))
+     goto fail;
+ 
++  if (grub_xfs_sb_needs_repair (data))
++    grub_dprintf ("xfs", "XFS filesystem needs repair, boot may fail\n");
++
+   if (grub_add (grub_xfs_inode_size (data),
+       sizeof (struct grub_xfs_data) - sizeof (struct grub_xfs_inode) + 1, &sz))
+     goto fail;
+-- 
+2.43.5
+

@@ -1,0 +1,50 @@
+From a6405bff7be8359a790f536a3fe2b84b96cfeccd Mon Sep 17 00:00:00 2001
+From: "t.feng" <fengtao40@huawei.com>
+Date: Tue, 29 Nov 2022 17:14:15 +0800
+Subject: [PATCH 671/676] fs/xfs: Fix memory leaks in XFS module
+
+Signed-off-by: t.feng <fengtao40@huawei.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/fs/xfs.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/grub-core/fs/xfs.c b/grub-core/fs/xfs.c
+index 4caf29f..171417d 100644
+--- a/grub-core/fs/xfs.c
++++ b/grub-core/fs/xfs.c
+@@ -598,7 +598,10 @@ grub_xfs_read_block (grub_fshelp_node_t node, grub_disk_addr_t fileblock)
+           if (grub_disk_read (node->data->disk,
+                               GRUB_XFS_FSB_TO_BLOCK (node->data, get_fsb (keys, i - 1 + recoffset)) << (node->data->sblock.log2_bsize - GRUB_DISK_SECTOR_BITS),
+                               0, node->data->bsize, leaf))
+-            return 0;
++            {
++              grub_free (leaf);
++              return 0;
++            }
+ 
+ 	  if ((!node->data->hascrc &&
+ 	       grub_strncmp ((char *) leaf->magic, "BMAP", 4)) ||
+@@ -789,6 +792,7 @@ static int iterate_dir_call_hook (grub_uint64_t ino, const char *filename,
+   if (err)
+     {
+       grub_print_error ();
++      grub_free (fdiro);
+       return 0;
+     }
+ 
+@@ -906,7 +910,10 @@ grub_xfs_iterate_dir (grub_fshelp_node_t dir,
+ 					  blk << dirblk_log2,
+ 					  dirblk_size, dirblock, 0);
+ 	    if (numread != dirblk_size)
+-	      return 0;
++	      {
++	        grub_free (dirblock);
++	        return 0;
++	      }
+ 
+ 	    entries = (grub_be_to_cpu32 (tail->leaf_count)
+ 		       - grub_be_to_cpu32 (tail->leaf_stale));
+-- 
+2.43.5
+
