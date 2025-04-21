@@ -7,7 +7,7 @@
 Name:                 grub2
 Epoch:                1
 Version:              2.02
-Release:              164%{?dist}.openela.0.3
+Release:              165%{?dist}.openela.0.3
 Summary:              Bootloader with support for Linux, Multiboot and more
 Group:                System Environment/Base
 License:              GPLv3+
@@ -521,7 +521,7 @@ fi
 %endif
 
 %changelog
-* Mon Apr 07 2025 Release Engineering <releng@openela.org> - 2.02.openela.0.3
+* Mon Apr 21 2025 Release Engineering <releng@openela.org> - 2.02.openela.0.3
 - Removing redhat old cert sources entries (Sherif Nagy)
 - Preserving rhel8 sbat entry based on shim-review feedback ticket no. 194
 - Adding prod cert
@@ -529,6 +529,10 @@ fi
 - Cleaning up grup.macro extra signing certs and updating openela test CA and CERT
 - Cleaning up grup.macro extra signing certs
 - Adding OpenELA testing CA, CERT and sbat files
+
+* Thu Apr 17 2025 Nicolas Frayer <nfrayer@redhat.com> - 2.02-165
+- fs/ext2: Rework of OOB read patch
+- Resolves: #RHEL-86553
 
 * Fri Apr 4 2025 Leo Sandoval <lsandova@redhat.com> - 2.02-164
 - Bump NVR to sign the build
