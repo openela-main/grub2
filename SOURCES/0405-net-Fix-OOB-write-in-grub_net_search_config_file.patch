@@ -21,7 +21,7 @@ Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
  3 files changed, 6 insertions(+), 5 deletions(-)
 
 diff --git a/grub-core/net/net.c b/grub-core/net/net.c
-index 2512862..6c0bd00 100644
+index 251286227..6c0bd00b4 100644
 --- a/grub-core/net/net.c
 +++ b/grub-core/net/net.c
 @@ -1971,14 +1971,15 @@ grub_config_search_through (char *config, char *suffix,
@@ -52,7 +52,7 @@ index 2512862..6c0bd00 100644
              return GRUB_ERR_NONE;
          }
 diff --git a/grub-core/normal/main.c b/grub-core/normal/main.c
-index 6f6e4a8..49b9472 100644
+index 6f6e4a813..49b947292 100644
 --- a/grub-core/normal/main.c
 +++ b/grub-core/normal/main.c
 @@ -360,7 +360,7 @@ grub_try_normal_prefix (const char *prefix)
@@ -65,7 +65,7 @@ index 6f6e4a8..49b9472 100644
  
      if (err != GRUB_ERR_NONE)
 diff --git a/include/grub/net.h b/include/grub/net.h
-index 43eba92..1101b03 100644
+index 43eba9216..1101b0397 100644
 --- a/include/grub/net.h
 +++ b/include/grub/net.h
 @@ -648,7 +648,7 @@ void

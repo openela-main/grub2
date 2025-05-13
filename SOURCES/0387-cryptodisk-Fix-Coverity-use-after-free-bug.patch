@@ -1,0 +1,72 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Glenn Washburn <development@efficientek.com>
+Date: Sat, 1 Jan 2022 15:48:25 -0600
+Subject: [PATCH] cryptodisk: Fix Coverity use after free bug
+
+The Coverity output is:
+
+  *** CID 366905:  Memory - illegal accesses  (USE_AFTER_FREE)
+  /grub-core/disk/cryptodisk.c: 1064 in grub_cryptodisk_scan_device_real()
+  1058      cleanup:
+  1059       if (askpass)
+  1060         {
+  1061           cargs->key_len = 0;
+  1062           grub_free (cargs->key_data);
+  1063         }
+  >>>     CID 366905:  Memory - illegal accesses  (USE_AFTER_FREE)
+  >>>     Using freed pointer "dev".
+  1064       return dev;
+  1065     }
+  1066
+  1067     #ifdef GRUB_UTIL
+  1068     #include <grub/util/misc.h>
+  1069     grub_err_t
+
+Here the "dev" variable can point to a freed cryptodisk device if the
+function grub_cryptodisk_insert() fails. This can happen only on a OOM
+condition, but when this happens grub_cryptodisk_insert() calls grub_free on
+the passed device. Since grub_cryptodisk_scan_device_real() assumes that
+grub_cryptodisk_insert() is always successful, it will return the device,
+though the device was freed.
+
+Change grub_cryptodisk_insert() to not free the passed device on failure.
+Then on grub_cryptodisk_insert() failure, free the device pointer. This is
+done by going to the label "error", which will call cryptodisk_close() to
+free the device and set the device pointer to NULL, so that a pointer to
+freed memory is not returned.
+
+Fixes: CID 366905
+
+Signed-off-by: Glenn Washburn <development@efficientek.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/disk/cryptodisk.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
+
+diff --git a/grub-core/disk/cryptodisk.c b/grub-core/disk/cryptodisk.c
+index 4970973..e7c4795 100644
+--- a/grub-core/disk/cryptodisk.c
++++ b/grub-core/disk/cryptodisk.c
+@@ -889,10 +889,7 @@ grub_cryptodisk_insert (grub_cryptodisk_t newdev, const char *name,
+ {
+   newdev->source = grub_strdup (name);
+   if (!newdev->source)
+-    {
+-      grub_free (newdev);
+-      return grub_errno;
+-    }
++    return grub_errno;
+ 
+   newdev->id = last_cryptodisk_id++;
+   newdev->source_id = source->id;
+@@ -1044,7 +1041,9 @@ grub_cryptodisk_scan_device_real (const char *name,
+     if (ret != GRUB_ERR_NONE)
+       goto error;
+ 
+-    grub_cryptodisk_insert (dev, name, source);
++    ret = grub_cryptodisk_insert (dev, name, source);
++    if (ret != GRUB_ERR_NONE)
++      goto error;
+ 
+     goto cleanup;
+   }

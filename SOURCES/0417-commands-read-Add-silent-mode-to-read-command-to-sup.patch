@@ -1,0 +1,106 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Glenn Washburn <development@efficientek.com>
+Date: Sun, 21 Mar 2021 15:22:19 -0500
+Subject: [PATCH] commands/read: Add silent mode to read command to suppress
+ input echo
+
+This conforms to the behavior of the -s option of the Bash read command.
+
+docs/grub: Document the -s option for the read command.
+
+Signed-off-by: Glenn Washburn <development@efficientek.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ docs/grub.texi            |  5 +++--
+ grub-core/commands/read.c | 28 ++++++++++++++++++----------
+ 2 files changed, 21 insertions(+), 12 deletions(-)
+
+diff --git a/docs/grub.texi b/docs/grub.texi
+index bbcd1c931..913c3bff3 100644
+--- a/docs/grub.texi
++++ b/docs/grub.texi
+@@ -5041,10 +5041,11 @@ and the system will reboot.
+ @node read
+ @subsection read
+ 
+-@deffn Command read [var]
++@deffn Command read [-s] [var]
+ Read a line of input from the user.  If an environment variable @var{var} is
+ given, set that environment variable to the line of input that was read,
+-with no terminating newline.
++with no terminating newline. If the parameter @option{-s} is used, enable
++silent mode where input is not printed to the terminal.
+ @end deffn
+ 
+ 
+diff --git a/grub-core/commands/read.c b/grub-core/commands/read.c
+index fe3e88b15..c2969ccda 100644
+--- a/grub-core/commands/read.c
++++ b/grub-core/commands/read.c
+@@ -23,13 +23,19 @@
+ #include <grub/env.h>
+ #include <grub/term.h>
+ #include <grub/types.h>
+-#include <grub/command.h>
++#include <grub/extcmd.h>
+ #include <grub/i18n.h>
+ 
+ GRUB_MOD_LICENSE ("GPLv3+");
+ 
++static const struct grub_arg_option options[] =
++  {
++    {"silent", 's', 0, N_("Do not echo input"), 0, 0},
++    {0, 0, 0, 0, 0, 0}
++  };
++
+ static char *
+-grub_getline (void)
++grub_getline (int silent)
+ {
+   int i;
+   char *line;
+@@ -48,7 +54,7 @@ grub_getline (void)
+ 	break;
+ 
+       line[i] = c;
+-      if (grub_isprint (c))
++      if (!silent && grub_isprint (c))
+ 	grub_printf ("%c", c);
+       i++;
+       tmp = grub_realloc (line, 1 + i + sizeof('\0'));
+@@ -65,9 +71,11 @@ grub_getline (void)
+ }
+ 
+ static grub_err_t
+-grub_cmd_read (grub_command_t cmd __attribute__ ((unused)), int argc, char **args)
++grub_cmd_read (grub_extcmd_context_t ctxt, int argc, char **args)
+ {
+-  char *line = grub_getline ();
++  struct grub_arg_list *state = ctxt->state;
++  char *line = grub_getline (state[0].set);
++
+   if (! line)
+     return grub_errno;
+   if (argc > 0)
+@@ -77,16 +85,16 @@ grub_cmd_read (grub_command_t cmd __attribute__ ((unused)), int argc, char **arg
+   return 0;
+ }
+ 
+-static grub_command_t cmd;
++static grub_extcmd_t cmd;
+ 
+ GRUB_MOD_INIT(read)
+ {
+-  cmd = grub_register_command ("read", grub_cmd_read,
+-			       N_("[ENVVAR]"),
+-			       N_("Set variable with user input."));
++  cmd = grub_register_extcmd ("read", grub_cmd_read, 0,
++			       N_("[-s] [ENVVAR]"),
++			       N_("Set variable with user input."), options);
+ }
+ 
+ GRUB_MOD_FINI(read)
+ {
+-  grub_unregister_command (cmd);
++  grub_unregister_extcmd (cmd);
+ }

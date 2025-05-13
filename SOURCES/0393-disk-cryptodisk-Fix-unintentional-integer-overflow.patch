@@ -1,0 +1,36 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Alec Brown <alec.r.brown@oracle.com>
+Date: Fri, 14 Oct 2022 17:47:08 -0400
+Subject: [PATCH] disk/cryptodisk: Fix unintentional integer overflow
+
+In the function grub_cryptodisk_endecrypt(), a for loop is incrementing the
+variable i by (1U << log_sector_size). The variable i is of type grub_size_t
+which is a 64-bit unsigned integer on x86_64 architecture. On the other hand, 1U
+is a 32-bit unsigned integer. By performing a left shift on a 32-bit value and
+assigning it to a 64-bit variable, the 64-bit variable may have incorrect values
+in the high 32-bits if the shift has an overflow. To avoid this, we replace 1U
+with (grub_size_t)1.
+
+Fixes: CID 307788
+
+Signed-off-by: Alec Brown <alec.r.brown@oracle.com>
+Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
+Reviewed-by: Patrick Steinhardt <ps@pks.im>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/disk/cryptodisk.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/grub-core/disk/cryptodisk.c b/grub-core/disk/cryptodisk.c
+index 17b5034..e23c618 100644
+--- a/grub-core/disk/cryptodisk.c
++++ b/grub-core/disk/cryptodisk.c
+@@ -262,7 +262,7 @@ grub_cryptodisk_endecrypt (struct grub_cryptodisk *dev,
+     return (do_encrypt ? grub_crypto_ecb_encrypt (dev->cipher, data, data, len)
+ 	    : grub_crypto_ecb_decrypt (dev->cipher, data, data, len));
+ 
+-  for (i = 0; i < len; i += (1U << log_sector_size))
++  for (i = 0; i < len; i += ((grub_size_t) 1 << log_sector_size))
+     {
+       grub_size_t sz = ((dev->cipher->cipher->blocksize
+ 			 + sizeof (grub_uint32_t) - 1)

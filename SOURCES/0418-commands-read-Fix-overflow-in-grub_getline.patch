@@ -1,0 +1,47 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Li Gen <ligenlive@gmail.com>
+Date: Thu, 25 Aug 2022 19:59:09 -0500
+Subject: [PATCH] commands/read: Fix overflow in grub_getline()
+
+Store returned value from grub_getkey() in int instead of char to
+prevent throwing away the extended bits. This was a problem because,
+for instance, the left arrow key press would return
+(GRUB_TERM_EXTENDED | 0x4b), which would have the GRUB_TERM_EXTENDED
+thrown away leaving 0x4b or 'K'. These extended keys should either
+work as intended or do nothing. This change has them do nothing,
+instead of inserting a key not pressed by the user.
+
+Signed-off-by: Li Gen <ligenlive@gmail.com>
+Signed-off-by: Glenn Washburn <development@efficientek.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/commands/read.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/grub-core/commands/read.c b/grub-core/commands/read.c
+index c2969ccda..597c90706 100644
+--- a/grub-core/commands/read.c
++++ b/grub-core/commands/read.c
+@@ -40,7 +40,7 @@ grub_getline (int silent)
+   int i;
+   char *line;
+   char *tmp;
+-  char c;
++  int c;
+ 
+   i = 0;
+   line = grub_malloc (1 + i + sizeof('\0'));
+@@ -53,8 +53,11 @@ grub_getline (int silent)
+       if ((c == '\n') || (c == '\r'))
+ 	break;
+ 
+-      line[i] = c;
+-      if (!silent && grub_isprint (c))
++      if (!grub_isprint (c))
++	continue;
++
++      line[i] = (char) c;
++      if (!silent)
+ 	grub_printf ("%c", c);
+       i++;
+       tmp = grub_realloc (line, 1 + i + sizeof('\0'));

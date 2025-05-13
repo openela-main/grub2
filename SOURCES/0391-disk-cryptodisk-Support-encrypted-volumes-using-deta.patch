@@ -1,0 +1,51 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Glenn Washburn <development@efficientek.com>
+Date: Sun, 7 Aug 2022 00:18:52 -0500
+Subject: [PATCH] disk/cryptodisk: Support encrypted volumes using detached
+ headers on a partition
+
+Update the read hook to take into account encrypted volumes on a partition.
+GRUB disk read hooks supply an absolute sector number at which the read is
+started from. If the encrypted volume is in a partition, the sector number
+given to the read hook will be offset by the number of the sector at the
+start of the partition. The read hook then needs to subtract the partition
+start from the supplied sector to get the correct start sector for the read
+into the detached header file.
+
+Reported-by: brutser <brutser@perso.be>
+Signed-off-by: Glenn Washburn <development@efficientek.com>
+Tested-by: brutser <brutser@perso.be>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/disk/cryptodisk.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/grub-core/disk/cryptodisk.c b/grub-core/disk/cryptodisk.c
+index 3d8472e..42370db 100644
+--- a/grub-core/disk/cryptodisk.c
++++ b/grub-core/disk/cryptodisk.c
+@@ -64,6 +64,7 @@ static const struct grub_arg_option options[] =
+ struct cryptodisk_read_hook_ctx
+ {
+   grub_file_t hdr_file;
++  grub_disk_addr_t part_start;
+ };
+ typedef struct cryptodisk_read_hook_ctx *cryptodisk_read_hook_ctx_t;
+ 
+@@ -1022,7 +1023,7 @@ cryptodisk_read_hook (grub_disk_addr_t sector, unsigned offset,
+     return grub_error (GRUB_ERR_BAD_ARGUMENT, N_("header file not found"));
+ 
+   if (grub_file_seek (ctx->hdr_file,
+-		      (sector * GRUB_DISK_SECTOR_SIZE) + offset)
++		      ((sector - ctx->part_start) * GRUB_DISK_SECTOR_SIZE) + offset)
+       == (grub_off_t) -1)
+     return grub_errno;
+ 
+@@ -1078,6 +1079,7 @@ grub_cryptodisk_scan_device_real (const char *name,
+        * times by a backend. This is fine because of the assumptions mentioned
+        * and the read hook reads from absolute offsets and is stateless.
+        */
++      read_hook_data.part_start = grub_partition_get_start (source->partition);
+       read_hook_data.hdr_file = cargs->hdr_file;
+       source->read_hook = cryptodisk_read_hook;
+       source->read_hook_data = (void *) &read_hook_data;

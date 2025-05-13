@@ -16,7 +16,7 @@
 Name:                 grub2
 Epoch:                1
 Version:              2.06
-Release:              94%{?dist}.openela.0.2
+Release:              104%{?dist}.openela.0.2
 Summary:              Bootloader with support for Linux, Multiboot and more
 License:              GPLv3+
 URL:                  http://www.gnu.org/software/grub/
@@ -548,7 +548,7 @@ mv ${EFI_HOME}/grub.cfg.stb ${EFI_HOME}/grub.cfg
 %endif
 
 %changelog
-* Mon Mar 17 2025 Release Engineering <releng@openela.org> - 2.06.openela.0.2
+* Tue May 13 2025 Release Engineering <releng@openela.org> - 2.06.openela.0.2
 - Removing redhat old cert sources entries (Sherif Nagy)
 - Preserving rhel8 sbat entry based on shim-review feedback ticket no. 194
 - Adding prod cert
@@ -558,14 +558,73 @@ mv ${EFI_HOME}/grub.cfg.stb ${EFI_HOME}/grub.cfg
 - Adding OpenELA testing CA, CERT and sbat files
 - Use DER for ppc64le builds from openela-sb-certs (Louis Abel)
 
-* Thu Feb 20 2025 Nicolas Frayer <nfrayer@redhat.com> 2.06-94
-- CVE fixes
-- Resolves: CVE-2025-0624
-- Resolves: #RHEL-79842
+* Fri Apr 4 2025 Nicolas Frayer <nfrayer@redhat.com> 2.06-104
+- Bump NVR to sign the build
+- Related: #RHEL-85961
+
+* Tue Apr 1 2025 Nicolas Frayer <nfrayer@redhat.com> 2.06-103
+- fs/xfs: Sync with latest xfs upstream
+- Resolves: #RHEL-85961
+
+* Tue Mar 25 2025 Nicolas Frayer <nfrayer@redhat.com> 2.06-102
+- ieee1275/ofnet: Fix grub_malloc() removed after added safe
+- Related: #RHEL-79846
+
+* Mon Mar 17 2025 Nicolas Frayer <nfrayer@redhat.com> 2.06-101
+- Added the following 2 commits to optimize memory consumption
+- tpm: Disable the tpm verifier if the TPM device is not present
+- powerpc: increase MIN RMA size for CAS negotiation
+- Resolves: #RHEL-76558
+
+* Wed Mar 12 2025 Nicolas Frayer <nfrayer@redhat.com> 2.06-100
+- Bump release for correct build tag
+- Related: RHEL-79857
+
+* Mon Mar 10 2025 Leo Sandoval <lsandova@redhat.com> 2.06-99
+- Remove 'fs/ntfs: Implement attribute verification' patch
+- Related: RHEL-79857
+
+* Fri Mar 7 2025 Nicolas Frayer <nfrayer@redhat.com> - 2.06-98
+- Bump release for tagging
+- Related: #RHEL-79846
+
+* Wed Feb 26 2025 Nicolas Frayer <nfrayer@redhat.com> - 2.06-97
+- fs/ext2: Rework out-of-bounds read for inline and external extents
+- Related: RHEL-79857
+
+* Wed Feb 12 2025 Nicolas Frayer <nfrayer@redhat.com> - 2.06-96
+- Fixes for several CVEs
+- Resolves: CVE-2024-45779 CVE-2024-45778 CVE-2025-1118
+- Resolves: CVE-2025-0677 CVE-2024-45782 CVE-2025-0690
+- Resolves: CVE-2024-45783 CVE-2025-0624 CVE-2024-45776
+- Resolves: CVE-2025-0622 CVE-2024-45774 CVE-2024-45775
+- Resolves: CVE-2024-45781 CVE-2024-45780
+- Resolves: #RHEL-79700
+- Resolves: #RHEL-79341
+- Resolves: #RHEL-79875
+- Resolves: #RHEL-79849
+- Resolves: #RHEL-79707
+- Resolves: #RHEL-79857
+- Resolves: #RHEL-79709
+- Resolves: #RHEL-79846
+- Resolves: #RHEL-75737
+- Resolves: #RHEL-79713
+- Resolves: #RHEL-73785
+- Resolves: #RHEL-73787
+- Resolves: #RHEL-79704
+- Resolves: #RHEL-79702
+
+* Mon Jan 13 2025 Nicolas Frayer <nfrayer@redhat.com> - 2.06-95
+- kern/ieee1275/init: Add IEEE 1275 Radix support for KVM on Power
+- Resolves: #RHEL-52761
+
+* Thu Nov 21 2024 Leo Sandoval <lsandova@redhat.com> - 2.06-94
+- 10_linux.in: escape semicolon and ampersand on BLS upddate
+- Resolves: #RHEL-25558
 
 * Wed Oct 16 2024 Nicolas Frayer <nfrayer@redhat.com> 2.06-93
 - cmd/search: Fix a possible NULL ptr dereference
-- Resolves: #RHEL-63828
+- Resolves: #RHEL-61263
 
 * Tue Aug 13 2024 Nicolas Frayer <nfrayer@redhat.com> - 2.06-92
 - arm64/linux: Allocate memory for kernel with EFI_LOADER_CODE type

@@ -1,0 +1,35 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Glenn Washburn <development@efficientek.com>
+Date: Wed, 28 Jun 2023 02:38:23 -0500
+Subject: [PATCH] include/grub/types.h: Add PRI*GRUB_OFFSET and
+ PRI*GRUB_DISK_ADDR
+
+These are currently always the same as PRI*GRUB_UINT64_T, but they may
+not be in the future.
+
+Signed-off-by: Glenn Washburn <development@efficientek.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ include/grub/types.h | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/include/grub/types.h b/include/grub/types.h
+index c00842a..1587ff4 100644
+--- a/include/grub/types.h
++++ b/include/grub/types.h
+@@ -181,10 +181,13 @@ typedef grub_uint64_t grub_properly_aligned_t;
+ #define GRUB_PROPERLY_ALIGNED_ARRAY(name, size) grub_properly_aligned_t name[((size) + sizeof (grub_properly_aligned_t) - 1) / sizeof (grub_properly_aligned_t)]
+ 
+ /* The type for representing a file offset.  */
+-typedef grub_uint64_t	grub_off_t;
++typedef grub_uint64_t		grub_off_t;
++#define PRIxGRUB_OFFSET		PRIxGRUB_UINT64_T
++#define PRIuGRUB_OFFSET		PRIuGRUB_UINT64_T
+ 
+ /* The type for representing a disk block address.  */
+-typedef grub_uint64_t	grub_disk_addr_t;
++typedef grub_uint64_t		grub_disk_addr_t;
++#define PRIxGRUB_DISK_ADDR	PRIxGRUB_UINT64_T
+ 
+ /* Byte-orders.  */
+ static inline grub_uint16_t grub_swap_bytes16(grub_uint16_t _x)
