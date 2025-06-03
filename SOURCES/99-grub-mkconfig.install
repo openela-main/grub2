@@ -8,9 +8,19 @@ ARCH=$(uname -m)
 
 [[ -f /etc/default/grub ]] && . /etc/default/grub
 
-# Can't assume a BLS capable bootloader on ppc64
-if [[ x$GRUB_ENABLE_BLSCFG = xtrue &&
-	  $ARCH != "ppc64" && $ARCH != "ppc64le" ]]; then
+# Assume GRUB_ENABLE_BLSCFG is true if
+# GRUB_ENABLE_BLSCFG is not set, e.g. /etc/default/grub does not exist
+# GRUB_ENABLE_BLSCFG is set to true
+if [[ x$GRUB_ENABLE_BLSCFG != xfalse ]]; then
+    # Can't assume a BLS capable bootloader on ppc64
+    if [[  $ARCH = "ppc64" || $ARCH = "ppc64le" ]]; then
+	RUN_MKCONFIG="true"
+    fi
+fi
+
+# A traditional grub configuration file needs to be generated only in the case when
+# the bootloaders are not capable of populating a menu entry from the BLS fragments.
+if [[ $RUN_MKCONFIG != "true" ]]; then
     exit 0
 fi
 

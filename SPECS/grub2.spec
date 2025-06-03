@@ -7,7 +7,7 @@
 Name:                 grub2
 Epoch:                1
 Version:              2.02
-Release:              165%{?dist}.openela.0.3
+Release:              167%{?dist}.openela.0.3
 Summary:              Bootloader with support for Linux, Multiboot and more
 Group:                System Environment/Base
 License:              GPLv3+
@@ -305,7 +305,10 @@ if [ "$1" = 1 ]; then
 fi
 
 if [ "$1" = 2 ]; then
-	/sbin/grub2-switch-to-blscfg --backup-suffix=.rpmsave &>/dev/null || :
+    if [ -f /etc/default/grub ]; then
+	! grep -q '^GRUB_ENABLE_BLSCFG=.*' /etc/default/grub && \
+	    /sbin/grub2-switch-to-blscfg --backup-suffix=.rpmsave &>/dev/null || :
+    fi
 fi
 
 %posttrans common
@@ -521,7 +524,7 @@ fi
 %endif
 
 %changelog
-* Mon Apr 21 2025 Release Engineering <releng@openela.org> - 2.02.openela.0.3
+* Tue Jun 03 2025 Release Engineering <releng@openela.org> - 2.02.openela.0.3
 - Removing redhat old cert sources entries (Sherif Nagy)
 - Preserving rhel8 sbat entry based on shim-review feedback ticket no. 194
 - Adding prod cert
@@ -529,6 +532,14 @@ fi
 - Cleaning up grup.macro extra signing certs and updating openela test CA and CERT
 - Cleaning up grup.macro extra signing certs
 - Adding OpenELA testing CA, CERT and sbat files
+
+* Thu Apr 24 2025 Leo Sandoval <lsandova@redhat.com> - 2.02-167
+- 99-grub-mkconfig.install: fix condition allowing correct checks if GRUB_ENABLE_BLSCFG is not present
+- Resolves: #RHEL-80168
+
+* Wed Apr 23 2025 Leo Sandoval <lsandova@redhat.com> - 2.02-166
+- Don't try to switch to a BLS config if GRUB_ENABLE_BLSCFG is already set
+- Resolves: #RHEL-86913
 
 * Thu Apr 17 2025 Nicolas Frayer <nfrayer@redhat.com> - 2.02-165
 - fs/ext2: Rework of OOB read patch
