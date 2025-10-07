@@ -1,0 +1,37 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Leo Sandoval <lsandova@redhat.com>
+Date: Wed, 3 Sep 2025 11:51:38 -0600
+Subject: [PATCH] Strip correctly BLS files with conf extension
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Renaud Métrich <rmetrich@redhat.com>
+Signed-off-by: Leo Sandoval <lsandova@redhat.com>
+---
+ grub-core/commands/blscfg.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/grub-core/commands/blscfg.c b/grub-core/commands/blscfg.c
+index 795a9f9f17..5e2302c4e8 100644
+--- a/grub-core/commands/blscfg.c
++++ b/grub-core/commands/blscfg.c
+@@ -417,12 +417,14 @@ static int bls_cmp(const void *p0, const void *p1, void *state)
+   id1 = grub_strdup(e1->filename);
+ 
+   l = grub_strlen(id0);
+-  if (l > 5 && grub_strcmp(id0 + l - 5, ".conf"))
+-    id0[l-5] = '\0';
++  if (l > 5)
++    if (!grub_strcmp(id0 + l - 5, ".conf"))
++      id0[l-5] = '\0';
+ 
+   l = grub_strlen(id1);
+-  if (l > 5 && grub_strcmp(id1 + l - 5, ".conf"))
+-    id1[l-5] = '\0';
++  if (l > 5)
++    if(!grub_strcmp(id1 + l - 5, ".conf"))
++      id1[l-5] = '\0';
+ 
+   r = split_cmp(id0, id1, 1);
+ 

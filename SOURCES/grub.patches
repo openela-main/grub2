@@ -674,3 +674,4 @@ Patch0674: 0674-fs-xfs-Add-large-extent-counters-incompat-feature-su.patch
 Patch0675: 0675-fs-xfs-Handle-non-continuous-data-blocks-in-director.patch
 Patch0676: 0676-fs-xfs-fix-large-extent-counters-incompat-feature-su.patch
 Patch0677: 0677-fs-ext2-Rework-out-of-bounds-read-for-inline-and-ext.patch
+Patch0678: 0678-Strip-correctly-BLS-files-with-conf-extension.patch

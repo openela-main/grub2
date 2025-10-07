@@ -7,7 +7,7 @@
 Name:                 grub2
 Epoch:                1
 Version:              2.02
-Release:              167%{?dist}.openela.0.3
+Release:              169%{?dist}.openela.0.3
 Summary:              Bootloader with support for Linux, Multiboot and more
 Group:                System Environment/Base
 License:              GPLv3+
@@ -524,7 +524,7 @@ fi
 %endif
 
 %changelog
-* Tue Jun 03 2025 Release Engineering <releng@openela.org> - 2.02.openela.0.3
+* Tue Oct 07 2025 Release Engineering <releng@openela.org> - 2.02.openela.0.3
 - Removing redhat old cert sources entries (Sherif Nagy)
 - Preserving rhel8 sbat entry based on shim-review feedback ticket no. 194
 - Adding prod cert
@@ -532,6 +532,14 @@ fi
 - Cleaning up grup.macro extra signing certs and updating openela test CA and CERT
 - Cleaning up grup.macro extra signing certs
 - Adding OpenELA testing CA, CERT and sbat files
+
+* Wed Sep 10 2025 Leo Sandoval <lsandova@redhat.com> - 2.02-169
+- Run mkconfig when GRUB_ENABLE_BLSCFG is false
+- Resolves: #RHEL-113830
+
+* Wed Sep  3 2025 Leo Sandoval <lsandova@redhat.com> - 2.02-168
+- Strip correctly BLS files with conf extension
+- Resolves: #RHEL-112099
 
 * Thu Apr 24 2025 Leo Sandoval <lsandova@redhat.com> - 2.02-167
 - 99-grub-mkconfig.install: fix condition allowing correct checks if GRUB_ENABLE_BLSCFG is not present

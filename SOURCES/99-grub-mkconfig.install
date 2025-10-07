@@ -16,6 +16,8 @@ if [[ x$GRUB_ENABLE_BLSCFG != xfalse ]]; then
     if [[  $ARCH = "ppc64" || $ARCH = "ppc64le" ]]; then
 	RUN_MKCONFIG="true"
     fi
+else
+    RUN_MKCONFIG="true"
 fi
 
 # A traditional grub configuration file needs to be generated only in the case when
