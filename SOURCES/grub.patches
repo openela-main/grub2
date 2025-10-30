@@ -461,3 +461,5 @@ Patch0461: 0461-fs-xfs-Fix-XFS-directory-extent-parsing.patch
 Patch0462: 0462-fs-xfs-Add-large-extent-counters-incompat-feature-su.patch
 Patch0463: 0463-fs-xfs-Handle-non-continuous-data-blocks-in-director.patch
 Patch0464: 0464-fs-xfs-fix-large-extent-counters-incompat-feature-su.patch
+Patch0465: 0465-10_linux.in-escape-kernel-option-characters-properly.patch
+Patch0466: 0466-blscfg-check-if-variable-is-escaped-before-consideri.patch

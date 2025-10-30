@@ -16,7 +16,7 @@
 Name:                 grub2
 Epoch:                1
 Version:              2.06
-Release:              104%{?dist}.openela.0.2
+Release:              105%{?dist}.openela.0.2
 Summary:              Bootloader with support for Linux, Multiboot and more
 License:              GPLv3+
 URL:                  http://www.gnu.org/software/grub/
@@ -548,7 +548,7 @@ mv ${EFI_HOME}/grub.cfg.stb ${EFI_HOME}/grub.cfg
 %endif
 
 %changelog
-* Tue May 13 2025 Release Engineering <releng@openela.org> - 2.06.openela.0.2
+* Thu Oct 30 2025 Release Engineering <releng@openela.org> - 2.06.openela.0.2
 - Removing redhat old cert sources entries (Sherif Nagy)
 - Preserving rhel8 sbat entry based on shim-review feedback ticket no. 194
 - Adding prod cert
@@ -557,6 +557,10 @@ mv ${EFI_HOME}/grub.cfg.stb ${EFI_HOME}/grub.cfg
 - Cleaning up grup.macro extra signing certs
 - Adding OpenELA testing CA, CERT and sbat files
 - Use DER for ppc64le builds from openela-sb-certs (Louis Abel)
+
+* Wed Sep 03 2025 Leo Sandoval <lsandova@redhat.com> 2.06-105
+- Handle special kernel parameter characters properly
+- Resolves: #RHEL-111748
 
 * Fri Apr 4 2025 Nicolas Frayer <nfrayer@redhat.com> 2.06-104
 - Bump NVR to sign the build
