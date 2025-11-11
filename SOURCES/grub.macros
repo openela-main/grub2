@@ -522,6 +522,8 @@ install -m 700 %{3} $RPM_BUILD_ROOT%{efi_esp_dir}/%{3}		\
 %ifarch %{arm}							\
 install -D -m 700 %{2} $RPM_BUILD_ROOT%{efi_esp_boot}/BOOTARM.EFI \
 %endif								\
+install -D -m 700 %{SOURCE13}                                  \\\
+    ${RPM_BUILD_ROOT}/usr/bin/gen_grub_cfgstub         		\
 install -D -m 700 unicode.pf2					\\\
 	${RPM_BUILD_ROOT}/boot/%{name}/fonts/unicode.pf2		\
 ${RPM_BUILD_ROOT}/%{_bindir}/%{name}-editenv			\\\
@@ -633,6 +635,7 @@ ln -s ../boot/%{name}/grub.cfg					\\\
 %attr(0700,root,root) %verify(not mtime) %{efi_esp_boot}/BOOTARM.EFI \
 %endif								\
 %attr(0700,root,root)/boot/%{name}/fonts			\
+%attr(0700,root,root)/usr/bin/gen_grub_cfgstub			\
 %dir %attr(0700,root,root)/boot/loader/entries			\
 %ghost %config(noreplace) %attr(0600,root,root)/boot/%{name}/grub.cfg	\
 %ghost %config(noreplace) %verify(not mtime) %attr(0700,root,root)%{efi_esp_dir}/grub.cfg	\

@@ -16,7 +16,7 @@
 Name:                 grub2
 Epoch:                1
 Version:              2.06
-Release:              105%{?dist}.openela.0.2
+Release:              114%{?dist}.openela.0.2
 Summary:              Bootloader with support for Linux, Multiboot and more
 License:              GPLv3+
 URL:                  http://www.gnu.org/software/grub/
@@ -34,6 +34,7 @@ Source9:              strtoull_test.c
 Source10:             20-grub.install
 Source11:             grub.patches
 Source12:             sbat.csv.in
+Source13:             gen_grub_cfgstub
 
 
 %include %{SOURCE1}
@@ -50,7 +51,7 @@ Source12:             sbat.csv.in
 %endif
 %else
 %ifarch x86_64 aarch64
-%define sb_key		openelalinuxsecurebootkey
+%define sb_key		redhatsecureboot802
 %endif
 %ifarch ppc64le
 %define sb_key		openelalinuxsecurebootkey
@@ -362,22 +363,12 @@ if test -f ${EFI_HOME}/grub.cfg; then
 fi
 
 # create a stub grub2 config in EFI
-BOOT_UUID=$(%{name}-probe --target=fs_uuid ${GRUB_HOME})
-GRUB_DIR=$(%{name}-mkrelpath ${GRUB_HOME})
-
-cat << EOF > ${EFI_HOME}/grub.cfg.stb
-search --no-floppy --root-dev-only --fs-uuid --set=dev ${BOOT_UUID}
-set prefix=(\$dev)${GRUB_DIR}
-export \$prefix
-configfile \$prefix/grub.cfg
-EOF
+gen_grub_cfgstub $GRUB_HOME $EFI_HOME || :
 
 if test -f ${EFI_HOME}/grubenv; then
     cp -a ${EFI_HOME}/grubenv ${EFI_HOME}/grubenv.rpmsave
     mv --force ${EFI_HOME}/grubenv ${GRUB_HOME}/grubenv
 fi
-
-mv ${EFI_HOME}/grub.cfg.stb ${EFI_HOME}/grub.cfg
 
 %files common -f grub.lang
 %dir %{_libdir}/grub/
@@ -548,7 +539,7 @@ mv ${EFI_HOME}/grub.cfg.stb ${EFI_HOME}/grub.cfg
 %endif
 
 %changelog
-* Thu Oct 30 2025 Release Engineering <releng@openela.org> - 2.06.openela.0.2
+* Tue Nov 11 2025 Release Engineering <releng@openela.org> - 2.06.openela.0.2
 - Removing redhat old cert sources entries (Sherif Nagy)
 - Preserving rhel8 sbat entry based on shim-review feedback ticket no. 194
 - Adding prod cert
@@ -558,39 +549,64 @@ mv ${EFI_HOME}/grub.cfg.stb ${EFI_HOME}/grub.cfg
 - Adding OpenELA testing CA, CERT and sbat files
 - Use DER for ppc64le builds from openela-sb-certs (Louis Abel)
 
-* Wed Sep 03 2025 Leo Sandoval <lsandova@redhat.com> 2.06-105
+* Wed Oct 8 2025 Nicolas Frayer <nfrayer@redhat.com> 2.06-114
+- spec: Update signing key to redhatsecureboot802
+- Resolves: #RHEL-116729
+
+* Thu Aug 7 2025 Nicolas Frayer <nfrayer@redhat.com> 2.06-113
+- sbat: add new sbat entry for centos
+- Resolves: #RHEL-108060
+
+* Tue Jul 29 2025 Leo Sandoval <lsandova@redhat.com> 2.06-112
+- Set correctly the memory attributes for the kernel PE sections
+- Resolves: #RHEL-106075
+
+* Tue Jul 29 2025 Nicolas Frayer <nfrayer@redhat.com> 2.06-111
+- spec/posttrans: move grub config stub creation out of spec
+- Resolves: #RHEL-69944
+
+* Fri Jun 6 2025 Nicolas Frayer <nfrayer@redhat.com> - 2.06-110
+- osdep/linux/getroot: Detect DDF container similar to IMSM
+- Resolves: #RHEL-44336
+
+* Mon Jun 2 2025 Leo Sandoval <lsandova@redhat.com> 2.06-109
 - Handle special kernel parameter characters properly
-- Resolves: #RHEL-111748
+- Resolves: #RHEL-64297
 
-* Fri Apr 4 2025 Nicolas Frayer <nfrayer@redhat.com> 2.06-104
-- Bump NVR to sign the build
-- Related: #RHEL-85961
+* Wed May 21 2025 Nicolas Frayer <nfrayer@redhat.com> - 2.06-108
+- ieee1275: Appended signature support
+- Resolves: #RHEL-24742
 
-* Tue Apr 1 2025 Nicolas Frayer <nfrayer@redhat.com> 2.06-103
+* Wed May 14 2025 Nicolas Frayer <nfrayer@redhat.com> - 2.06-107
+- Remove BLS fake config in case of kernel removal
+- Resolves: #RHEL-83915
+
+* Wed May 14 2025 Nicolas Frayer <nfrayer@redhat.com> - 2.06-106
+- sbat: bump grub sbat for new shim release
+- Resolves: #RHEL-91278
+
+* Tue Apr 15 2025 Nicolas Frayer <nfrayer@redhat.com> - 2.06-105
+- ppc/mkimage: SBAT support on powerpc
+- Resolves: #RHEL-87421
+
+* Thu Apr 3 2025 Nicolas Frayer <nfrayer@redhat.com> 2.06-104
 - fs/xfs: Sync with latest xfs upstream
-- Resolves: #RHEL-85961
+- Resolves: #RHEL-85960
+- (NVR bump to catch up with zstream)
 
-* Tue Mar 25 2025 Nicolas Frayer <nfrayer@redhat.com> 2.06-102
+* Tue Mar 25 2025 Nicolas Frayer <nfrayer@redhat.com> 2.06-100
 - ieee1275/ofnet: Fix grub_malloc() removed after added safe
-- Related: #RHEL-79846
+- Resolves: #RHEL-83117
 
-* Mon Mar 17 2025 Nicolas Frayer <nfrayer@redhat.com> 2.06-101
+* Mon Mar 17 2025 Nicolas Frayer <nfrayer@redhat.com> 2.06-99
 - Added the following 2 commits to optimize memory consumption
 - tpm: Disable the tpm verifier if the TPM device is not present
 - powerpc: increase MIN RMA size for CAS negotiation
 - Resolves: #RHEL-76558
 
-* Wed Mar 12 2025 Nicolas Frayer <nfrayer@redhat.com> 2.06-100
-- Bump release for correct build tag
-- Related: RHEL-79857
-
-* Mon Mar 10 2025 Leo Sandoval <lsandova@redhat.com> 2.06-99
+* Mon Mar 10 2025 Leo Sandoval <lsandova@redhat.com> 2.06-98
 - Remove 'fs/ntfs: Implement attribute verification' patch
-- Related: RHEL-79857
-
-* Fri Mar 7 2025 Nicolas Frayer <nfrayer@redhat.com> - 2.06-98
-- Bump release for tagging
-- Related: #RHEL-79846
+- Related: RHEL-83117
 
 * Wed Feb 26 2025 Nicolas Frayer <nfrayer@redhat.com> - 2.06-97
 - fs/ext2: Rework out-of-bounds read for inline and external extents
