@@ -17,7 +17,7 @@
 Name:		grub2
 Epoch:		1
 Version:	2.12
-Release:	15%{?dist}
+Release:	29%{?dist}
 Summary:	Bootloader with support for Linux, Multiboot and more
 License:	GPL-3.0-or-later
 URL:		http://www.gnu.org/software/grub/
@@ -35,6 +35,7 @@ Source9:	strtoull_test.c
 Source10:	20-grub.install
 Source11:	grub.patches
 Source12:	sbat.csv.in
+Source13:	gen_grub_cfgstub
 
 %include %{SOURCE1}
 
@@ -50,7 +51,7 @@ Source12:	sbat.csv.in
 %endif
 %else
 %ifarch x86_64 aarch64
-%define sb_key		redhatsecureboot502
+%define sb_key		redhatsecureboot802
 %endif
 %ifarch ppc64le
 %define sb_key		redhatsecureboot702
@@ -395,22 +396,12 @@ if test -f ${EFI_HOME}/grub.cfg; then
 fi
 
 # create a stub grub2 config in EFI
-BOOT_UUID=$(grub2-probe --target=fs_uuid ${GRUB_HOME})
-GRUB_DIR=$(grub2-mkrelpath ${GRUB_HOME})
-
-cat << EOF > ${EFI_HOME}/grub.cfg.stb
-search --no-floppy --root-dev-only --fs-uuid --set=dev ${BOOT_UUID}
-set prefix=(\$dev)${GRUB_DIR}
-export \$prefix
-configfile \$prefix/grub.cfg
-EOF
+gen_grub_cfgstub $GRUB_HOME $EFI_HOME || :
 
 if test -f ${EFI_HOME}/grubenv; then
     cp -a ${EFI_HOME}/grubenv ${EFI_HOME}/grubenv.rpmsave
     mv --force ${EFI_HOME}/grubenv ${GRUB_HOME}/grubenv
 fi
-
-mv ${EFI_HOME}/grub.cfg.stb ${EFI_HOME}/grub.cfg
 
 %files common -f grub.lang
 %dir %{_libdir}/grub/
@@ -583,14 +574,69 @@ mv ${EFI_HOME}/grub.cfg.stb ${EFI_HOME}/grub.cfg
 %endif
 
 %changelog
+* Wed Oct 8 2025 Nicolas Frayer <nfrayer@redhat.com> 2.12-29
+- spec: Update signing key to redhatsecureboot802
+- Resolves: #RHEL-116730
+
+* Thu Aug 21 2025 Leo Sandoval <lsandova@redhat.com> 2.12-28
+- Remove strong stack protector on target CFLAGS
+- Related: #RHEL-89464
+
+* Fri Aug 15 2025 Leo Sandoval <lsandova@redhat.com> 2.12-27
+- Revert annobin's regex removal into cflags_sed
+- Resolves: #RHEL-89464
+
+* Thu Jul 31 2025 Leo Sandoval <lsandova@redhat.com> 2.12-26
+- Enable strong stack protector on EFI configurations
+- Resolves: #RHEL-89464
+
+* Thu Jul 31 2025 Leo Sandoval <lsandova@redhat.com> 2.12-25
+- 20-grub.install: Skip BLS removal when entry type is type2
+- Resolves: #RHEL-104167
+
+* Tue Jul 29 2025 Nicolas Frayer <nfrayer@redhat.com> 2.12-24
+- spec/posttrans: move grub config stub creation out of spec
+- Resolves: #RHEL-69943
+
+* Tue Jul 15 2025 Leo Sandoval <lsandova@redhat.com> 2.12-23
+- Set correctly the memory attributes for the kernel PE sections
+- Resolves: #RHEL-97086
+
+* Tue Jul 15 2025 Leo Sandoval <lsandova@redhat.com> 2.12-22
+- workaround: do not update mem attrs even if EFI protocol is present
+- Resolves: #RHEL-97086
+
+* Fri Jun 6 2025 Leo Sandoval <lsandova@redhat.com> 2.12-21
+- Bump version (see CS-2896)
+- Resolves: #RHEL-94342
+
+* Mon Jun 2 2025 Leo Sandoval <lsandova@redhat.com> 2.12-20
+- Handle special kernel parameter characters properly
+- Resolves: #RHEL-94342
+
+* Wed May 14 2025 Nicolas Frayer <nfrayer@redhat.com> - 2.12-19
+- sbat: bump grub sbat for new shim release
+- Resolves: #RHEL-91277
+
+* Tue May 13 2025 Nicolas Frayer <nfrayer@redhat.com> - 2.12-18
+- sbat: add new sbat entry for centos
+- Resolves: #RHEL-91146
+
+* Wed Apr 16 2025 Andrea Bolognani <abologna@redhat.com> - 2.12-17
+- Fix riscv64 build
+  Resolves: RHEL-85987
+
+* Tue Apr 15 2025 Nicolas Frayer <nfrayer@redhat.com> - 2.12-16
+- ppc/mkimage: SBAT support on powerpc
+- Resolves: #RHEL-87420
+
 * Mon Apr 7 2025 Marta Lewandowska <mlewando@redhat.com> - 2.12-15
 - 99-grub-mkconfig.install: Disable BLS and run grub2-mkconfig when GRUB_ENABLE_BLSCFG is disable
-- Resolves: #RHEL-98679
-- Resolves: #RHEL-98682
+- Resolves: #RHEL-86261
 
 * Tue Mar 25 2025 Nicolas Frayer <nfrayer@redhat.com> 2.12-14
 - ieee1275/ofnet: Fix grub_malloc() removed after added safe
-- Related: #RHEL-79836
+- Related: #RHEL-80073
 
 * Tue Mar 18 2025 Nicolas Frayer <nfrayer@redhat.com> 2.12-13
 - powerpc: increase MIN RMA size for CAS negotiation
@@ -598,15 +644,14 @@ mv ${EFI_HOME}/grub.cfg.stb ${EFI_HOME}/grub.cfg
 
 * Mon Mar 10 2025 Leo Sandoval <lsandova@redhat.com> 2.12-12
 - Remove 'fs/ntfs: Implement attribute verification' patch
-- Resolves: #RHEL-79836
+- Related: RHEL-80686
 
-* Fri Mar 7 2025 Nicolas Frayer <nfrayer@redhat.com> - 2.12-11
-- Bump release for tagging
-- Related: #RHEL-79836
+* Wed Feb 26 2025 Nicolas Frayer <nfrayer@redhat.com> - 2.12-11
+- Bump release to trigger signing tools
 
 * Wed Feb 26 2025 Nicolas Frayer <nfrayer@redhat.com> - 2.12-10
 - fs/ext2: Rework out-of-bounds read for inline and external extents
-- Related: #RHEL-79856
+- Related: #RHEL-80686
 
 * Tue Feb 18 2025 Leo Sandoval <lsandova@redhat.com> - 2.12-9
 - Add Several CVE fixes
@@ -615,20 +660,11 @@ mv ${EFI_HOME}/grub.cfg.stb ${EFI_HOME}/grub.cfg
 - Resolves: CVE-2025-0690 CVE-2025-1118 CVE-2024-45782
 - Resolves: CVE-2025-0624 CVE-2024-45779 CVE-2024-45776
 - Resolves: CVE-2025-0622 CVE-2025-0677
-- Resolves: #RHEL-79703
-- Resolves: #RHEL-79708
-- Resolves: #RHEL-79340
-- Resolves: #RHEL-73786
-- Resolves: #RHEL-79701
-- Resolves: #RHEL-73784
-- Resolves: #RHEL-79856
-- Resolves: #RHEL-79874
-- Resolves: #RHEL-79706
-- Resolves: #RHEL-79836
-- Resolves: #RHEL-79699
-- Resolves: #RHEL-75736
-- Resolves: #RHEL-79712
-- Resolves: #RHEL-79848
+- Resolves: #RHEL-80691
+- Resolves: #RHEL-80690
+- Resolves: #RHEL-80689
+- Resolves: #RHEL-80687
+- Resolves: #RHEL-80686
 
 * Wed Jan 22 2025 Leo Sandoval <lsandova@redhat.com> 2.12-8
 - fix pending SAST issues
