@@ -1,0 +1,45 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Glenn Washburn <development@efficientek.com>
+Date: Mon, 23 Nov 2020 03:27:42 -0600
+Subject: [PATCH] fs: Fix block lists not being able to address to end of disk
+ sometimes
+
+When checking if a block list goes past the end of the disk, make sure
+the total size of the disk is in GRUB native sector sizes, otherwise there
+will be blocks at the end of the disk inaccessible by block lists.
+
+Signed-off-by: Glenn Washburn <development@efficientek.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/kern/fs.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/grub-core/kern/fs.c b/grub-core/kern/fs.c
+index 730d21770f2b..84d2f14fb88a 100644
+--- a/grub-core/kern/fs.c
++++ b/grub-core/kern/fs.c
+@@ -139,6 +139,7 @@ grub_fs_blocklist_open (grub_file_t file, const char *name)
+   unsigned i;
+   grub_disk_t disk = file->device->disk;
+   struct grub_fs_block *blocks;
++  grub_size_t max_sectors;
+ 
+   /* First, count the number of blocks.  */
+   do
+@@ -156,6 +157,7 @@ grub_fs_blocklist_open (grub_file_t file, const char *name)
+     return 0;
+ 
+   file->size = 0;
++  max_sectors = grub_disk_from_native_sector (disk, disk->total_sectors);
+   p = (char *) name;
+   for (i = 0; i < num; i++)
+     {
+@@ -181,7 +183,7 @@ grub_fs_blocklist_open (grub_file_t file, const char *name)
+ 	  goto fail;
+ 	}
+ 
+-      if (disk->total_sectors < blocks[i].offset + blocks[i].length)
++      if (max_sectors < blocks[i].offset + blocks[i].length)
+ 	{
+ 	  grub_error (GRUB_ERR_BAD_FILENAME, "beyond the total sectors");
+ 	  goto fail;

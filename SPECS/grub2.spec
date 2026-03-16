@@ -7,7 +7,7 @@
 Name:                 grub2
 Epoch:                1
 Version:              2.02
-Release:              169%{?dist}.openela.0.3
+Release:              170%{?dist}.1.openela.0.3
 Summary:              Bootloader with support for Linux, Multiboot and more
 Group:                System Environment/Base
 License:              GPLv3+
@@ -524,7 +524,7 @@ fi
 %endif
 
 %changelog
-* Tue Oct 07 2025 Release Engineering <releng@openela.org> - 2.02.openela.0.3
+* Mon Mar 16 2026 Release Engineering <releng@openela.org> - 2.02.openela.0.3
 - Removing redhat old cert sources entries (Sherif Nagy)
 - Preserving rhel8 sbat entry based on shim-review feedback ticket no. 194
 - Adding prod cert
@@ -532,6 +532,14 @@ fi
 - Cleaning up grup.macro extra signing certs and updating openela test CA and CERT
 - Cleaning up grup.macro extra signing certs
 - Adding OpenELA testing CA, CERT and sbat files
+
+* Thu Feb 19 2026 Therese Cornell <tcornell@redhat.com> - 2.02-170.1
+- Fixes CVE-2025-61662 Missing unregister call for gettext command may lead to use-after-free
+- Resolves: #RHEL-141583
+
+* Thu Jan 22 2026 Nicolas Frayer <nfrayer@redhat.com> - 2.02-170
+- fs/xfs/ppc64le: Update xfs code to fix install on 4KB block size
+- Resolves: #RHEL-142208
 
 * Wed Sep 10 2025 Leo Sandoval <lsandova@redhat.com> - 2.02-169
 - Run mkconfig when GRUB_ENABLE_BLSCFG is false

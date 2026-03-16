@@ -1,0 +1,67 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Glenn Washburn <development@efficientek.com>
+Date: Mon, 7 Sep 2020 17:27:59 +0200
+Subject: [PATCH] cryptodisk: Fix incorrect calculation of start sector
+
+Here dev is a grub_cryptodisk_t and dev->offset is offset in sectors of size
+native to the cryptodisk device. The sector is correctly transformed into
+native grub sector size, but then added to dev->offset which is not
+transformed. It would be nice if the type system would help us with this.
+
+Signed-off-by: Glenn Washburn <development@efficientek.com>
+Reviewed-by: Patrick Steinhardt <ps@pks.im>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/disk/cryptodisk.c | 11 ++++-------
+ include/grub/disk.h         |  7 +++++++
+ 2 files changed, 11 insertions(+), 7 deletions(-)
+
+diff --git a/grub-core/disk/cryptodisk.c b/grub-core/disk/cryptodisk.c
+index 871640685d73..f4fd59095f6c 100644
+--- a/grub-core/disk/cryptodisk.c
++++ b/grub-core/disk/cryptodisk.c
+@@ -597,9 +597,8 @@ grub_cryptodisk_read (grub_disk_t disk, grub_disk_addr_t sector,
+ 		size, sector, dev->offset);
+ 
+   err = grub_disk_read (dev->source_disk,
+-			(sector << (disk->log_sector_size
+-				   - GRUB_DISK_SECTOR_BITS)) + dev->offset, 0,
+-			size << disk->log_sector_size, buf);
++			grub_disk_from_native_sector (disk, sector + dev->offset),
++			0, size << disk->log_sector_size, buf);
+   if (err)
+     {
+       grub_dprintf ("cryptodisk", "grub_disk_read failed with error %d\n", err);
+@@ -656,12 +655,10 @@ grub_cryptodisk_write (grub_disk_t disk, grub_disk_addr_t sector,
+     }
+ 
+   /* Since ->write was called so disk.mod is loaded but be paranoid  */
+-  
++  sector = sector + dev->offset;
+   if (grub_disk_write_weak)
+     err = grub_disk_write_weak (dev->source_disk,
+-				(sector << (disk->log_sector_size
+-					    - GRUB_DISK_SECTOR_BITS))
+-				+ dev->offset,
++				grub_disk_from_native_sector (disk, sector),
+ 				0, size << disk->log_sector_size, tmp);
+   else
+     err = grub_error (GRUB_ERR_BUG, "disk.mod not loaded");
+diff --git a/include/grub/disk.h b/include/grub/disk.h
+index 4d3c2e571ef8..0091fbca181c 100644
+--- a/include/grub/disk.h
++++ b/include/grub/disk.h
+@@ -180,6 +180,13 @@ grub_disk_to_native_sector (grub_disk_t disk, grub_disk_addr_t sector)
+   return sector >> (disk->log_sector_size - GRUB_DISK_SECTOR_BITS);
+ }
+ 
++/* Convert to GRUB native disk sized sector from disk sized sector. */
++static inline grub_disk_addr_t
++grub_disk_from_native_sector (grub_disk_t disk, grub_disk_addr_t sector)
++{
++  return sector << (disk->log_sector_size - GRUB_DISK_SECTOR_BITS);
++}
++
+ /* This is called from the memory manager.  */
+ void grub_disk_cache_invalidate_all (void);
+ 

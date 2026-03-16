@@ -675,3 +675,8 @@ Patch0675: 0675-fs-xfs-Handle-non-continuous-data-blocks-in-director.patch
 Patch0676: 0676-fs-xfs-fix-large-extent-counters-incompat-feature-su.patch
 Patch0677: 0677-fs-ext2-Rework-out-of-bounds-read-for-inline-and-ext.patch
 Patch0678: 0678-Strip-correctly-BLS-files-with-conf-extension.patch
+Patch0679: 0679-disk-Rename-grub_disk_get_size-to-grub_disk_native_s.patch
+Patch0680: 0680-fs-Fix-block-lists-not-being-able-to-address-to-end-.patch
+Patch0681: 0681-osdep-linux-hostdisk-Modify-sector-by-sysfs-as-disk-.patch
+Patch0682: 0682-cryptodisk-Fix-incorrect-calculation-of-start-sector.patch
+Patch0683: 0683-gettext-gettext-Unregister-gettext-command-on-module.patch
