@@ -17,7 +17,7 @@
 Name:		grub2
 Epoch:		1
 Version:	2.12
-Release:	29%{?dist}
+Release:	29%{?dist}.2
 Summary:	Bootloader with support for Linux, Multiboot and more
 License:	GPL-3.0-or-later
 URL:		http://www.gnu.org/software/grub/
@@ -574,6 +574,14 @@ fi
 %endif
 
 %changelog
+* Tue Mar 03 2026 Nicolas Frayer <nfrayer@redhat.com> - 2.12-29.2
+- Try to get gating tests running via fmf/tmt
+- Resolves: #RHEL-152849
+
+* Thu Feb 19 2026 Therese Cornell <tcornell@redhat.com> - 2.12-29.1
+- Fixes CVE-2025-61662 Missing unregister call for gettext command may lead to use-after-free
+- Resolves: #RHEL-141580
+
 * Wed Oct 8 2025 Nicolas Frayer <nfrayer@redhat.com> 2.12-29
 - spec: Update signing key to redhatsecureboot802
 - Resolves: #RHEL-116730
