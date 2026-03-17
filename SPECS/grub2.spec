@@ -16,7 +16,7 @@
 Name:                 grub2
 Epoch:                1
 Version:              2.06
-Release:              114%{?dist}.openela.0.2
+Release:              114%{?dist}.1.openela.0.2
 Summary:              Bootloader with support for Linux, Multiboot and more
 License:              GPLv3+
 URL:                  http://www.gnu.org/software/grub/
@@ -539,7 +539,7 @@ fi
 %endif
 
 %changelog
-* Tue Nov 11 2025 Release Engineering <releng@openela.org> - 2.06.openela.0.2
+* Tue Mar 17 2026 Release Engineering <releng@openela.org> - 2.06.openela.0.2
 - Removing redhat old cert sources entries (Sherif Nagy)
 - Preserving rhel8 sbat entry based on shim-review feedback ticket no. 194
 - Adding prod cert
@@ -548,6 +548,10 @@ fi
 - Cleaning up grup.macro extra signing certs
 - Adding OpenELA testing CA, CERT and sbat files
 - Use DER for ppc64le builds from openela-sb-certs (Louis Abel)
+
+* Thu Feb 19 2026 Therese Cornell <tcornell@redhat.com> - 2.06-114.1
+- Fixes CVE-2025-61662 Missing unregister call for gettext command may lead to use-after-free
+- Resolves: #RHEL-141593
 
 * Wed Oct 8 2025 Nicolas Frayer <nfrayer@redhat.com> 2.06-114
 - spec: Update signing key to redhatsecureboot802

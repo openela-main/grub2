@@ -477,3 +477,4 @@ Patch0477: 0477-10_linux.in-escape-kernel-option-characters-properly.patch
 Patch0478: 0478-blscfg-check-if-variable-is-escaped-before-consideri.patch
 Patch0479: 0479-osdep-linux-getroot-Detect-DDF-container-similar-to-.patch
 Patch0480: 0480-Set-correctly-the-memory-attributes-for-the-kernel-P.patch
+Patch0481: 0481-gettext-gettext-Unregister-gettext-command-on-module.patch
