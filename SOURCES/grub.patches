@@ -368,3 +368,4 @@ Patch0368: 0368-10_linux.in-escape-kernel-option-characters-properly.patch
 Patch0369: 0369-blscfg-check-if-variable-is-escaped-before-consideri.patch
 Patch0370: 0370-Set-correctly-the-memory-attributes-for-the-kernel-P.patch
 Patch0371: 0371-gettext-gettext-Unregister-gettext-command-on-module.patch
+Patch0372: 0372-kern-efi-mm-Change-grub_efi_mm_add_regions-to-keep-t.patch

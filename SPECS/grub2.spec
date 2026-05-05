@@ -17,7 +17,7 @@
 Name:		grub2
 Epoch:		1
 Version:	2.12
-Release:	29%{?dist}.2
+Release:	29%{?dist}.3
 Summary:	Bootloader with support for Linux, Multiboot and more
 License:	GPL-3.0-or-later
 URL:		http://www.gnu.org/software/grub/
@@ -574,6 +574,10 @@ fi
 %endif
 
 %changelog
+* Wed Mar 11 2026 Josue Hernandez <josherna@redhat.com> - 2.12-29.3
+- kern/efi/mm: Change grub_efi_mm_add_regions() to keep track of map allocation size
+- Resolves: #RHEL-155287
+
 * Tue Mar 03 2026 Nicolas Frayer <nfrayer@redhat.com> - 2.12-29.2
 - Try to get gating tests running via fmf/tmt
 - Resolves: #RHEL-152849
