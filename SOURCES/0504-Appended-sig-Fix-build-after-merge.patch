@@ -1,0 +1,124 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Nicolas Frayer <nfrayer@redhat.com>
+Date: Thu, 13 Nov 2025 08:24:41 -0500
+Subject: [PATCH] Appended sig: Fix build after merge
+
+Fixed build for duplicates and previous partial merge from upstream.
+
+Signed-off-by: Nicolas Frayer <nfrayer@redhat.com>
+---
+ grub-core/commands/appendedsig/appendedsig.c | 2 +-
+ grub-core/commands/appendedsig/appendedsig.h | 2 +-
+ grub-core/commands/appendedsig/x509.c        | 2 +-
+ include/grub/kernel.h                        | 1 -
+ util/grub-install-common.c                   | 6 ------
+ util/grub-mkimage.c                          | 7 -------
+ util/grub-mkimagexx.c                        | 9 ---------
+ 7 files changed, 3 insertions(+), 26 deletions(-)
+
+diff --git a/grub-core/commands/appendedsig/appendedsig.c b/grub-core/commands/appendedsig/appendedsig.c
+index 5c53f63..1c74554 100644
+--- a/grub-core/commands/appendedsig/appendedsig.c
++++ b/grub-core/commands/appendedsig/appendedsig.c
+@@ -30,7 +30,7 @@
+ #include <grub/kernel.h>
+ #include <grub/extcmd.h>
+ #include <grub/verify.h>
+-#include <libtasn1.h>
++#include <grub/libtasn1.h>
+ #include <grub/env.h>
+ #include <grub/lockdown.h>
+ #include <grub/powerpc/ieee1275/platform_keystore.h>
+diff --git a/grub-core/commands/appendedsig/appendedsig.h b/grub-core/commands/appendedsig/appendedsig.h
+index c874654..cb0fe19 100644
+--- a/grub-core/commands/appendedsig/appendedsig.h
++++ b/grub-core/commands/appendedsig/appendedsig.h
+@@ -18,7 +18,7 @@
+  */
+ 
+ #include <grub/crypto.h>
+-#include <libtasn1.h>
++#include <grub/libtasn1.h>
+ 
+ extern asn1_node grub_gnutls_gnutls_asn;
+ extern asn1_node grub_gnutls_pkix_asn;
+diff --git a/grub-core/commands/appendedsig/x509.c b/grub-core/commands/appendedsig/x509.c
+index bc15266..08846aa 100644
+--- a/grub-core/commands/appendedsig/x509.c
++++ b/grub-core/commands/appendedsig/x509.c
+@@ -17,7 +17,7 @@
+  *  along with GRUB.  If not, see <http://www.gnu.org/licenses/>.
+  */
+ 
+-#include <libtasn1.h>
++#include <grub/libtasn1.h>
+ #include <grub/types.h>
+ #include <grub/err.h>
+ #include <grub/mm.h>
+diff --git a/include/grub/kernel.h b/include/grub/kernel.h
+index 0ada600..bd0826b 100644
+--- a/include/grub/kernel.h
++++ b/include/grub/kernel.h
+@@ -28,7 +28,6 @@ enum
+   OBJ_TYPE_MEMDISK,
+   OBJ_TYPE_CONFIG,
+   OBJ_TYPE_PREFIX,
+-  OBJ_TYPE_GPG_PUBKEY,
+   OBJ_TYPE_X509_PUBKEY,
+   OBJ_TYPE_DTB,
+   OBJ_TYPE_DISABLE_SHIM_LOCK,
+diff --git a/util/grub-install-common.c b/util/grub-install-common.c
+index 7f0aedb..6c82ff2 100644
+--- a/util/grub-install-common.c
++++ b/util/grub-install-common.c
+@@ -505,12 +505,6 @@ grub_install_parse (int key, char *arg)
+     case GRUB_INSTALL_OPTIONS_DISABLE_SHIM_LOCK:
+       disable_shim_lock = 1;
+       return 1;
+-    case 'x':
+-      x509keys = xrealloc (x509keys,
+-			  sizeof (x509keys[0])
+-			  * (nx509keys + 1));
+-      x509keys[nx509keys++] = xstrdup (arg);
+-      return 1;
+     case GRUB_INSTALL_OPTIONS_DISABLE_CLI:
+       disable_cli = 1;
+       return 1;
+diff --git a/util/grub-mkimage.c b/util/grub-mkimage.c
+index 55f3eaa..21f5aa0 100644
+--- a/util/grub-mkimage.c
++++ b/util/grub-mkimage.c
+@@ -178,13 +178,6 @@ argp_parser (int key, char *arg, struct argp_state *state)
+       arguments->note = 1;
+       break;
+ 
+-    case 'S':
+-      grub_errno = 0;
+-      arguments->appsig_size = grub_strtol(arg, &end, 10);
+-      if (grub_errno)
+-        return 0;
+-      break;
+-
+     case 'S':
+       arguments->appsig_size = grub_strtoul (arg, &end, 10);
+       if (*arg == '\0' || *end != '\0')
+diff --git a/util/grub-mkimagexx.c b/util/grub-mkimagexx.c
+index ca25b2d..7da40d5 100644
+--- a/util/grub-mkimagexx.c
++++ b/util/grub-mkimagexx.c
+@@ -84,15 +84,6 @@ struct grub_ieee1275_note
+   struct grub_ieee1275_note_desc descriptor;
+ };
+ 
+-#define GRUB_APPENDED_SIGNATURE_NOTE_NAME "Appended-Signature"
+-#define GRUB_APPENDED_SIGNATURE_NOTE_TYPE 0x41536967 /* "ASig" */
+-
+-struct grub_appended_signature_note
+-{
+-  Elf32_Nhdr header;
+-  char name[ALIGN_UP(sizeof (GRUB_APPENDED_SIGNATURE_NOTE_NAME), 4)];
+-};
+-
+ #define GRUB_XEN_NOTE_NAME "Xen"
+ 
+ struct fixup_block_list

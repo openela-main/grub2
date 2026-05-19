@@ -1,0 +1,36 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Heinrich Schuchardt <heinrich.schuchardt@canonical.com>
+Date: Fri, 13 Aug 2021 16:15:33 +0200
+Subject: [PATCH] libgcrypt: Avoid -Wsign-compare in rijndael do_setkey()
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Avoid a warning
+
+  lib/libgcrypt-grub/cipher/rijndael.c:352:21: warning:
+  comparison of integer expressions of different signedness:
+  ‘int’ and ‘unsigned int’ [-Wsign-compare]
+    352 |       for (i = 0; i < keylen; i++)
+        |
+
+Signed-off-by: Heinrich Schuchardt <heinrich.schuchardt@canonical.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/lib/libgcrypt/cipher/rijndael.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/grub-core/lib/libgcrypt/cipher/rijndael.c b/grub-core/lib/libgcrypt/cipher/rijndael.c
+index 559550b..38e9a7c 100644
+--- a/grub-core/lib/libgcrypt/cipher/rijndael.c
++++ b/grub-core/lib/libgcrypt/cipher/rijndael.c
+@@ -181,7 +181,8 @@ do_setkey (RIJNDAEL_context *ctx, const byte *key, const unsigned keylen)
+   static int initialized = 0;
+   static const char *selftest_failed=0;
+   int rounds;
+-  int i,j, r, t, rconpointer = 0;
++  unsigned int i;
++  int j, r, t, rconpointer = 0;
+   int KC;
+   union
+   {

@@ -1,0 +1,1235 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Elyes Haouas <ehaouas@noos.fr>
+Date: Fri, 4 Mar 2022 07:42:04 +0100
+Subject: [PATCH] lib: Remove trailing whitespaces
+
+Signed-off-by: Elyes Haouas <ehaouas@noos.fr>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/lib/arg.c                               |  2 +-
+ grub-core/lib/crypto.c                            | 14 +++---
+ grub-core/lib/efi/relocator.c                     |  8 ++--
+ grub-core/lib/fdt.c                               |  4 +-
+ grub-core/lib/i386/reboot.c                       |  2 +-
+ grub-core/lib/i386/relocator.c                    |  2 +-
+ grub-core/lib/ieee1275/cmos.c                     |  4 +-
+ grub-core/lib/ieee1275/relocator.c                |  4 +-
+ grub-core/lib/legacy_parse.c                      | 26 ++++++------
+ grub-core/lib/libgcrypt/cipher/test-getrusage.c   | 14 +++---
+ grub-core/lib/libgcrypt/mpi/generic/mpih-add1.c   |  6 +--
+ grub-core/lib/libgcrypt/mpi/generic/mpih-lshift.c |  2 +-
+ grub-core/lib/libgcrypt/mpi/generic/mpih-mul1.c   |  4 +-
+ grub-core/lib/libgcrypt/mpi/generic/mpih-mul2.c   |  6 +--
+ grub-core/lib/libgcrypt/mpi/generic/mpih-mul3.c   |  4 +-
+ grub-core/lib/libgcrypt/mpi/generic/mpih-sub1.c   |  4 +-
+ grub-core/lib/libgcrypt/mpi/i386/syntax.h         |  2 +-
+ grub-core/lib/libgcrypt/mpi/m68k/syntax.h         |  2 +-
+ grub-core/lib/mips/loongson/reboot.c              |  2 +-
+ grub-core/lib/mips/relocator.c                    |  2 +-
+ grub-core/lib/posix_wrap/ctype.h                  | 14 +++---
+ grub-core/lib/posix_wrap/stdlib.h                 |  2 +-
+ grub-core/lib/posix_wrap/string.h                 |  4 +-
+ grub-core/lib/posix_wrap/wctype.h                 |  2 +-
+ grub-core/lib/powerpc/relocator.c                 |  4 +-
+ grub-core/lib/priority_queue.c                    |  2 +-
+ grub-core/lib/reed_solomon.c                      |  6 +--
+ grub-core/lib/relocator.c                         | 48 ++++++++++-----------
+ grub-core/lib/syslinux_parse.c                    | 52 +++++++++++------------
+ grub-core/lib/xzembed/xz_dec_stream.c             |  6 +--
+ 30 files changed, 127 insertions(+), 127 deletions(-)
+
+diff --git a/grub-core/lib/arg.c b/grub-core/lib/arg.c
+index ade82d5..c2bd6a4 100644
+--- a/grub-core/lib/arg.c
++++ b/grub-core/lib/arg.c
+@@ -270,7 +270,7 @@ grub_arg_parse (grub_extcmd_t cmd, int argc, char **argv,
+ 	      for (curshort = arg + 1; *curshort; curshort++)
+ 		if (!find_short (cmd->options, *curshort))
+ 		  break;
+-	    
++
+ 	      if (*curshort)
+ 		{
+ 		  if (add_arg (&argl, &num, arg) != 0)
+diff --git a/grub-core/lib/crypto.c b/grub-core/lib/crypto.c
+index c578128..d53ddbe 100644
+--- a/grub-core/lib/crypto.c
++++ b/grub-core/lib/crypto.c
+@@ -59,7 +59,7 @@ _gcry_burn_stack (int size)
+ void __attribute__ ((noreturn))
+ _gcry_assert_failed (const char *expr, const char *file, int line,
+ 		     const char *func)
+-  
++
+ {
+   grub_fatal ("assertion %s at %s:%d (%s) failed\n", expr, file, line, func);
+ }
+@@ -83,7 +83,7 @@ void _gcry_log_error (const char *fmt, ...)
+     }
+ }
+ 
+-void 
++void
+ grub_cipher_register (gcry_cipher_spec_t *cipher)
+ {
+   cipher->next = grub_ciphers;
+@@ -102,14 +102,14 @@ grub_cipher_unregister (gcry_cipher_spec_t *cipher)
+       }
+ }
+ 
+-void 
++void
+ grub_md_register (gcry_md_spec_t *digest)
+ {
+   digest->next = grub_digests;
+   grub_digests = digest;
+ }
+ 
+-void 
++void
+ grub_md_unregister (gcry_md_spec_t *cipher)
+ {
+   gcry_md_spec_t **ciph;
+@@ -318,7 +318,7 @@ grub_crypto_hmac_init (const struct gcry_md_spec *md,
+   if (!ctx)
+     goto err;
+ 
+-  if ( keylen > md->blocksize ) 
++  if ( keylen > md->blocksize )
+     {
+       helpkey = grub_malloc (md->mdlen);
+       if (!helpkey)
+@@ -339,7 +339,7 @@ grub_crypto_hmac_init (const struct gcry_md_spec *md,
+ 
+   grub_memcpy ( ipad, key, keylen );
+   grub_memcpy ( opad, key, keylen );
+-  for (i=0; i < md->blocksize; i++ ) 
++  for (i=0; i < md->blocksize; i++ )
+     {
+       ipad[i] ^= 0x36;
+       opad[i] ^= 0x5c;
+@@ -462,7 +462,7 @@ grub_password_get (char buf[], unsigned buf_size)
+ 
+   while (1)
+     {
+-      key = grub_getkey (); 
++      key = grub_getkey ();
+       if (key == '\n' || key == '\r')
+ 	break;
+ 
+diff --git a/grub-core/lib/efi/relocator.c b/grub-core/lib/efi/relocator.c
+index 319b69e..84da70a 100644
+--- a/grub-core/lib/efi/relocator.c
++++ b/grub-core/lib/efi/relocator.c
+@@ -26,7 +26,7 @@
+ #define NEXT_MEMORY_DESCRIPTOR(desc, size)	\
+   ((grub_efi_memory_descriptor_t *) ((char *) (desc) + (size)))
+ 
+-unsigned 
++unsigned
+ grub_relocator_firmware_get_max_events (void)
+ {
+   grub_efi_uintn_t mmapsize = 0, descriptor_size = 0;
+@@ -39,7 +39,7 @@ grub_relocator_firmware_get_max_events (void)
+   return 2 * (mmapsize / descriptor_size + 10);
+ }
+ 
+-unsigned 
++unsigned
+ grub_relocator_firmware_fill_events (struct grub_relocator_mmap_event *events)
+ {
+   grub_efi_uintn_t mmapsize = 0, desc_size = 0;
+@@ -65,7 +65,7 @@ grub_relocator_firmware_fill_events (struct grub_relocator_mmap_event *events)
+       grub_uint64_t start = desc->physical_start;
+       grub_uint64_t end = desc->physical_start + (desc->num_pages << 12);
+ 
+-      /* post-4G addresses are never supported on 32-bit EFI. 
++      /* post-4G addresses are never supported on 32-bit EFI.
+ 	 Moreover it has been reported that some 64-bit EFI contrary to the
+ 	 spec don't map post-4G pages. So if you enable post-4G allocations,
+ 	 map pages manually or check that they are mapped.
+@@ -81,7 +81,7 @@ grub_relocator_firmware_fill_events (struct grub_relocator_mmap_event *events)
+       counter++;
+       events[counter].type = REG_FIRMWARE_END;
+       events[counter].pos = end;
+-      counter++;      
++      counter++;
+     }
+ 
+   return counter;
+diff --git a/grub-core/lib/fdt.c b/grub-core/lib/fdt.c
+index 37e04bd..fbf749e 100644
+--- a/grub-core/lib/fdt.c
++++ b/grub-core/lib/fdt.c
+@@ -333,7 +333,7 @@ int grub_fdt_next_node (const void *fdt, unsigned int currentoffset)
+     return -1;
+   return (int) ((grub_addr_t) token - (grub_addr_t) fdt
+ 		- grub_fdt_get_off_dt_struct (fdt));
+-}			 
++}
+ 
+ int grub_fdt_first_node (const void *fdt, unsigned int parentoffset)
+ {
+@@ -353,7 +353,7 @@ int grub_fdt_first_node (const void *fdt, unsigned int parentoffset)
+     return -1;
+   return (int) ((grub_addr_t) token - (grub_addr_t) fdt
+ 		- grub_fdt_get_off_dt_struct (fdt));
+-}			 
++}
+ 
+ /* Find a direct sub-node of a given parent node. */
+ int grub_fdt_find_subnode (const void *fdt, unsigned int parentoffset,
+diff --git a/grub-core/lib/i386/reboot.c b/grub-core/lib/i386/reboot.c
+index dce0b56..d0fd6a5 100644
+--- a/grub-core/lib/i386/reboot.c
++++ b/grub-core/lib/i386/reboot.c
+@@ -55,7 +55,7 @@ grub_reboot (void)
+   state.a20 = 0;
+ 
+   grub_stop_floppy ();
+-  
++
+   err = grub_relocator16_boot (relocator, state);
+ 
+   while (1);
+diff --git a/grub-core/lib/i386/relocator.c b/grub-core/lib/i386/relocator.c
+index 34cbe83..54a1dcd 100644
+--- a/grub-core/lib/i386/relocator.c
++++ b/grub-core/lib/i386/relocator.c
+@@ -131,7 +131,7 @@ grub_relocator16_boot (struct grub_relocator *rel,
+   if (err)
+     return err;
+ 
+-  grub_relocator16_cs = state.cs;  
++  grub_relocator16_cs = state.cs;
+   grub_relocator16_ip = state.ip;
+ 
+   grub_relocator16_ds = state.ds;
+diff --git a/grub-core/lib/ieee1275/cmos.c b/grub-core/lib/ieee1275/cmos.c
+index 328d70a..1400cfb 100644
+--- a/grub-core/lib/ieee1275/cmos.c
++++ b/grub-core/lib/ieee1275/cmos.c
+@@ -52,7 +52,7 @@ grub_cmos_find_port_iter (struct grub_ieee1275_devalias *alias)
+ #if GRUB_CPU_SIZEOF_VOID_P == 8
+   if (actual == 8)
+     {
+-      grub_cmos_port = (volatile grub_uint8_t *) 
++      grub_cmos_port = (volatile grub_uint8_t *)
+ 	((((grub_addr_t) addr[0]) << 32) | addr[1]);
+       return 1;
+     }
+@@ -72,6 +72,6 @@ grub_cmos_find_port (void)
+   grub_ieee1275_devices_iterate (grub_cmos_find_port_iter);
+   if (!grub_cmos_port)
+     return grub_error (GRUB_ERR_IO, "no cmos found");
+-  
++
+   return GRUB_ERR_NONE;
+ }
+diff --git a/grub-core/lib/ieee1275/relocator.c b/grub-core/lib/ieee1275/relocator.c
+index d1bb45c..918392f 100644
+--- a/grub-core/lib/ieee1275/relocator.c
++++ b/grub-core/lib/ieee1275/relocator.c
+@@ -33,7 +33,7 @@ count (grub_uint64_t addr __attribute__ ((unused)),
+   return 0;
+ }
+ 
+-unsigned 
++unsigned
+ grub_relocator_firmware_get_max_events (void)
+ {
+   int counter = 0;
+@@ -82,7 +82,7 @@ grub_relocator_firmware_fill_events_iter (grub_uint64_t addr,
+   return 0;
+ }
+ 
+-unsigned 
++unsigned
+ grub_relocator_firmware_fill_events (struct grub_relocator_mmap_event *events)
+ {
+   struct grub_relocator_firmware_fill_events_ctx ctx = {
+diff --git a/grub-core/lib/legacy_parse.c b/grub-core/lib/legacy_parse.c
+index 05719ab..fa0131a 100644
+--- a/grub-core/lib/legacy_parse.c
++++ b/grub-core/lib/legacy_parse.c
+@@ -92,7 +92,7 @@ static struct legacy_command legacy_commands[] =
+      2, {TYPE_FILE, TYPE_FILE}, FLAG_IGNORE_REST, "FILE1 FILE2",
+      "Compare the file FILE1 with the FILE2 and inform the different values"
+      " if any."},
+-    {"color", "set color_normal='%s'; set color_highlight='%s'\n", NULL, 0, 
++    {"color", "set color_normal='%s'; set color_highlight='%s'\n", NULL, 0,
+      2, {TYPE_VERBATIM, TYPE_VERBATIM},
+      FLAG_IGNORE_REST | FLAG_FALLBACK_AVAILABLE, "NORMAL [HIGHLIGHT]",
+      "Change the menu colors. The color NORMAL is used for most"
+@@ -115,7 +115,7 @@ static struct legacy_command legacy_commands[] =
+      0, {}, 0, 0, "Turn on/off the debug mode."},
+     {"default",
+      "set default='%s'; if [ x\"$default\" = xsaved ]; then load_env; "
+-     "set default=\"$saved_entry\"; fi\n", NULL, 0, 1, {TYPE_VERBATIM}, 0, 
++     "set default=\"$saved_entry\"; fi\n", NULL, 0, 1, {TYPE_VERBATIM}, 0,
+      "[NUM | `saved']",
+      "Set the default entry to entry number NUM (if not specified, it is"
+      " 0, the first entry) or the entry number saved by savedefault."},
+@@ -128,7 +128,7 @@ static struct legacy_command legacy_commands[] =
+      " tag."},
+     {"displayapm", "lsapm\n", NULL, 0, 0, {}, 0, 0,
+      "Display APM BIOS information."},
+-    {"displaymem", "lsmmap\n", NULL, 0, 0, {}, 0, 0, 
++    {"displaymem", "lsmmap\n", NULL, 0, 0, {}, 0, 0,
+      "Display what GRUB thinks the system address space map of the"
+      " machine is, including all regions of physical RAM installed."},
+     /* FIXME: device and efimap unsupported.  */
+@@ -213,7 +213,7 @@ static struct legacy_command legacy_commands[] =
+      1, {TYPE_BOOL}, FLAG_FALLBACK_AVAILABLE, "[FLAG]",
+      "Toggle pager mode with no argument. If FLAG is given and its value"
+      " is `on', turn on the mode. If FLAG is `off', turn off the mode."},
+-    {"pager", 
++    {"pager",
+      "if [ \"$pager\" = 1 ]; then pager=0; echo Internal pager is now off;"
+       "else pager=1; echo Internal pager is now on; fi\n", NULL, 0, 0, {},
+      FLAG_FALLBACK, NULL, NULL},
+@@ -291,7 +291,7 @@ static struct legacy_command legacy_commands[] =
+      "Save the current entry as the default boot entry if no argument is"
+      " specified. If a number is specified, this number is saved. If"
+      " `fallback' is used, next fallback entry is saved."},
+-    {"serial", "serial %s\n", NULL, 0, 1, {TYPE_REST_VERBATIM}, 0, 
++    {"serial", "serial %s\n", NULL, 0, 1, {TYPE_REST_VERBATIM}, 0,
+      "[--unit=UNIT] [--port=PORT] [--speed=SPEED] [--word=WORD] "
+      "[--parity=PARITY] [--stop=STOP] [--device=DEV]",
+      "Initialize a serial device. UNIT is a digit that specifies which serial"
+@@ -438,7 +438,7 @@ adjust_file (const char *in, grub_size_t len)
+     {
+       if (*ptr == '\'' || *ptr == '\\')
+ 	*outptr++ = '\\';
+-      
++
+       *outptr++ = *ptr;
+     }
+   if (subpart != -1)
+@@ -451,7 +451,7 @@ adjust_file (const char *in, grub_size_t len)
+     {
+       if (*ptr == '\'' || *ptr == '\\')
+ 	*outptr++ = '\\';
+-      
++
+       *outptr++ = *ptr;
+     }
+   *outptr = 0;
+@@ -489,7 +489,7 @@ is_option (enum arg_type opt, const char *curarg, grub_size_t len)
+       return (len >= 2 && curarg[0] == '-' && curarg[1] == '-');
+     default:
+       return 0;
+-    } 
++    }
+ }
+ 
+ char *
+@@ -635,7 +635,7 @@ grub_legacy_parse (const char *buf, char **entryname, char **suffix)
+ 
+   {
+     int hold_arg = 0;
+-    const char *curarg = NULL; 
++    const char *curarg = NULL;
+     for (i = 0; i < legacy_commands[cmdnum].argc; i++)
+       {
+  	grub_size_t curarglen;
+@@ -685,7 +685,7 @@ grub_legacy_parse (const char *buf, char **entryname, char **suffix)
+ 		    ptr++;
+ 		  overhead += 3;
+ 		}
+-		
++
+ 	      outptr0 = args[i] = grub_malloc (overhead + (ptr - curarg));
+ 	      if (!outptr0)
+ 		return NULL;
+@@ -819,14 +819,14 @@ grub_legacy_parse (const char *buf, char **entryname, char **suffix)
+       case TYPE_FORCE_OPTION:
+       case TYPE_NOAPM_OPTION:
+       case TYPE_TYPE_OR_NOMEM_OPTION:
+-      case TYPE_OPTION:	
++      case TYPE_OPTION:
+ 	args[i] = grub_strdup ("");
+ 	break;
+       case TYPE_BOOL:
+       case TYPE_INT:
+ 	args[i] = grub_strdup ("0");
+ 	break;
+-      case TYPE_VBE_MODE:    
++      case TYPE_VBE_MODE:
+ 	args[i] = grub_strdup ("auto");
+ 	break;
+       }
+@@ -849,7 +849,7 @@ grub_legacy_parse (const char *buf, char **entryname, char **suffix)
+       if (!invert)
+ 	return NULL;
+       grub_memcpy (invert, slash + 1, len - (slash - corig) - 1);
+-      invert[len - (slash - args[0]) - 1] = '/'; 
++      invert[len - (slash - args[0]) - 1] = '/';
+       grub_memcpy (invert + len - (slash - corig), corig, slash - corig);
+       invert[len] = 0;
+       args[legacy_commands[cmdnum].argc] = invert;
+diff --git a/grub-core/lib/libgcrypt/cipher/test-getrusage.c b/grub-core/lib/libgcrypt/cipher/test-getrusage.c
+index 479eaab..978cf2d 100644
+--- a/grub-core/lib/libgcrypt/cipher/test-getrusage.c
++++ b/grub-core/lib/libgcrypt/cipher/test-getrusage.c
+@@ -27,7 +27,7 @@ main (int argc, char **argv)
+     }
+ 
+   printf ("ru_utime   = %ld.%06ld\n",
+-          buf.ru_utime.tv_sec, buf.ru_utime.tv_usec); 
++          buf.ru_utime.tv_sec, buf.ru_utime.tv_usec);
+   printf ("ru_stime   = %ld.%06ld\n",
+           buf.ru_stime.tv_sec, buf.ru_stime.tv_usec);
+   printf ("ru_maxrss  = %ld\n", buf.ru_maxrss   );
+@@ -60,7 +60,7 @@ collect_rusage_stats (struct rusage *rb)
+ {
+   static int idx;
+   static struct rusage buf[100];
+-  
++
+   if (!rb)
+     {
+       int i;
+@@ -68,12 +68,12 @@ collect_rusage_stats (struct rusage *rb)
+       fprintf (stderr, "ru_utime   ru_stime   ru_minflt  ru_nvcsw  ru_nivcsw\n");
+       for (i=0; i < idx; i++)
+         fprintf (stderr, "%ld.%06ld   %ld.%06ld %5ld       %5ld      %5ld\n",
+-                 buf[i].ru_utime.tv_sec, buf[i].ru_utime.tv_usec, 
+-                 buf[i].ru_stime.tv_sec, buf[i].ru_stime.tv_usec, 
+-                 buf[i].ru_minflt, 
++                 buf[i].ru_utime.tv_sec, buf[i].ru_utime.tv_usec,
++                 buf[i].ru_stime.tv_sec, buf[i].ru_stime.tv_usec,
++                 buf[i].ru_minflt,
+                  buf[i].ru_nvcsw,
+                  buf[i].ru_nivcsw);
+-    }      
++    }
+   else if (idx < DIM(buf))
+     {
+       buf[idx++] = *rb;
+@@ -99,7 +99,7 @@ collect_rusage_stats (struct rusage *rb)
+      add_randomness( &buf, sizeof buf, 1 );
+      memset( &buf, 0, sizeof buf );
+    }
+- 
++
+ */
+ 
+ 
+diff --git a/grub-core/lib/libgcrypt/mpi/generic/mpih-add1.c b/grub-core/lib/libgcrypt/mpi/generic/mpih-add1.c
+index 4a84df6..4ffe0eb 100644
+--- a/grub-core/lib/libgcrypt/mpi/generic/mpih-add1.c
++++ b/grub-core/lib/libgcrypt/mpi/generic/mpih-add1.c
+@@ -1,5 +1,5 @@
+ /* mpihelp-add_1.c  -  MPI helper functions
+- * Copyright (C) 1994, 1996, 1997, 1998, 
++ * Copyright (C) 1994, 1996, 1997, 1998,
+  *               2000, 2002 Free Software Foundation, Inc.
+  *
+  * This file is part of Libgcrypt.
+@@ -48,7 +48,7 @@ _gcry_mpih_add_n (mpi_ptr_t res_ptr, mpi_ptr_t s1_ptr,
+   res_ptr -= j;
+ 
+   cy = 0;
+-  do 
++  do
+     {
+       y = s2_ptr[j];
+       x = s1_ptr[j];
+@@ -57,7 +57,7 @@ _gcry_mpih_add_n (mpi_ptr_t res_ptr, mpi_ptr_t s1_ptr,
+       y += x; 		  /* add other addend */
+       cy += y < x;	  /* get out carry from that add, combine */
+       res_ptr[j] = y;
+-    } 
++    }
+   while ( ++j );
+ 
+   return cy;
+diff --git a/grub-core/lib/libgcrypt/mpi/generic/mpih-lshift.c b/grub-core/lib/libgcrypt/mpi/generic/mpih-lshift.c
+index f48c12c..8c1d943 100644
+--- a/grub-core/lib/libgcrypt/mpi/generic/mpih-lshift.c
++++ b/grub-core/lib/libgcrypt/mpi/generic/mpih-lshift.c
+@@ -54,7 +54,7 @@ _gcry_mpih_lshift( mpi_ptr_t wp, mpi_ptr_t up, mpi_size_t usize,
+   low_limb = up[i];
+   retval = low_limb >> sh_2;
+   high_limb = low_limb;
+-  while ( --i >= 0 ) 
++  while ( --i >= 0 )
+     {
+       low_limb = up[i];
+       wp[i] = (high_limb << sh_1) | (low_limb >> sh_2);
+diff --git a/grub-core/lib/libgcrypt/mpi/generic/mpih-mul1.c b/grub-core/lib/libgcrypt/mpi/generic/mpih-mul1.c
+index 0e8197d..614646c 100644
+--- a/grub-core/lib/libgcrypt/mpi/generic/mpih-mul1.c
++++ b/grub-core/lib/libgcrypt/mpi/generic/mpih-mul1.c
+@@ -48,13 +48,13 @@ _gcry_mpih_mul_1( mpi_ptr_t res_ptr, mpi_ptr_t s1_ptr, mpi_size_t s1_size,
+   res_ptr -= j;
+ 
+   cy_limb = 0;
+-  do 
++  do
+     {
+       umul_ppmm( prod_high, prod_low, s1_ptr[j], s2_limb );
+       prod_low += cy_limb;
+       cy_limb = (prod_low < cy_limb?1:0) + prod_high;
+       res_ptr[j] = prod_low;
+-    } 
++    }
+   while( ++j );
+ 
+   return cy_limb;
+diff --git a/grub-core/lib/libgcrypt/mpi/generic/mpih-mul2.c b/grub-core/lib/libgcrypt/mpi/generic/mpih-mul2.c
+index 3b75496..56979df 100644
+--- a/grub-core/lib/libgcrypt/mpi/generic/mpih-mul2.c
++++ b/grub-core/lib/libgcrypt/mpi/generic/mpih-mul2.c
+@@ -48,7 +48,7 @@ _gcry_mpih_addmul_1( mpi_ptr_t res_ptr, mpi_ptr_t s1_ptr,
+   s1_ptr -= j;
+ 
+   cy_limb = 0;
+-  do 
++  do
+     {
+       umul_ppmm( prod_high, prod_low, s1_ptr[j], s2_limb );
+ 
+@@ -59,9 +59,9 @@ _gcry_mpih_addmul_1( mpi_ptr_t res_ptr, mpi_ptr_t s1_ptr,
+       prod_low = x + prod_low;
+       cy_limb += prod_low < x?1:0;
+       res_ptr[j] = prod_low;
+-    } 
++    }
+   while ( ++j );
+-    
++
+   return cy_limb;
+ }
+ 
+diff --git a/grub-core/lib/libgcrypt/mpi/generic/mpih-mul3.c b/grub-core/lib/libgcrypt/mpi/generic/mpih-mul3.c
+index 5e84f94..9b8df1a 100644
+--- a/grub-core/lib/libgcrypt/mpi/generic/mpih-mul3.c
++++ b/grub-core/lib/libgcrypt/mpi/generic/mpih-mul3.c
+@@ -48,7 +48,7 @@ _gcry_mpih_submul_1( mpi_ptr_t res_ptr, mpi_ptr_t s1_ptr,
+   s1_ptr -= j;
+ 
+   cy_limb = 0;
+-  do 
++  do
+     {
+       umul_ppmm( prod_high, prod_low, s1_ptr[j], s2_limb);
+ 
+@@ -59,7 +59,7 @@ _gcry_mpih_submul_1( mpi_ptr_t res_ptr, mpi_ptr_t s1_ptr,
+       prod_low = x - prod_low;
+       cy_limb += prod_low > x?1:0;
+       res_ptr[j] = prod_low;
+-    } 
++    }
+   while( ++j );
+ 
+   return cy_limb;
+diff --git a/grub-core/lib/libgcrypt/mpi/generic/mpih-sub1.c b/grub-core/lib/libgcrypt/mpi/generic/mpih-sub1.c
+index e88821b..25b08af 100644
+--- a/grub-core/lib/libgcrypt/mpi/generic/mpih-sub1.c
++++ b/grub-core/lib/libgcrypt/mpi/generic/mpih-sub1.c
+@@ -48,7 +48,7 @@ _gcry_mpih_sub_n( mpi_ptr_t res_ptr, mpi_ptr_t s1_ptr,
+   res_ptr -= j;
+ 
+   cy = 0;
+-  do 
++  do
+     {
+       y = s2_ptr[j];
+       x = s1_ptr[j];
+@@ -57,7 +57,7 @@ _gcry_mpih_sub_n( mpi_ptr_t res_ptr, mpi_ptr_t s1_ptr,
+       y = x - y;		  /* main subtract */
+       cy += y > x;		  /* get out carry from the subtract, combine */
+       res_ptr[j] = y;
+-    } 
++    }
+   while( ++j );
+ 
+   return cy;
+diff --git a/grub-core/lib/libgcrypt/mpi/i386/syntax.h b/grub-core/lib/libgcrypt/mpi/i386/syntax.h
+index 39ede98..88845f2 100644
+--- a/grub-core/lib/libgcrypt/mpi/i386/syntax.h
++++ b/grub-core/lib/libgcrypt/mpi/i386/syntax.h
+@@ -1,6 +1,6 @@
+ /* syntax.h -- Definitions for x86 syntax variations.
+  *
+- *       Copyright (C) 1992, 1994, 1995, 1998, 
++ *       Copyright (C) 1992, 1994, 1995, 1998,
+  *                     2001, 2002 Free Software Foundation, Inc.
+  *
+  * This file is part of Libgcrypt.
+diff --git a/grub-core/lib/libgcrypt/mpi/m68k/syntax.h b/grub-core/lib/libgcrypt/mpi/m68k/syntax.h
+index e27de98..6a3fea1 100644
+--- a/grub-core/lib/libgcrypt/mpi/m68k/syntax.h
++++ b/grub-core/lib/libgcrypt/mpi/m68k/syntax.h
+@@ -2,7 +2,7 @@
+  *
+  *      Copyright (C) 1992, 1994, 1996, 1998,
+  *                    2001, 2002 Free Software Foundation, Inc.
+- *       
++ *
+  * This file is part of Libgcrypt.
+  *
+  * Libgcrypt is free software; you can redistribute it and/or modify
+diff --git a/grub-core/lib/mips/loongson/reboot.c b/grub-core/lib/mips/loongson/reboot.c
+index a20e574..7317e58 100644
+--- a/grub-core/lib/mips/loongson/reboot.c
++++ b/grub-core/lib/mips/loongson/reboot.c
+@@ -42,7 +42,7 @@ grub_reboot (void)
+ 	  break;
+ 	grub_cs5536_write_msr (dev, GRUB_CS5536_MSR_DIVIL_RESET,
+ 			       grub_cs5536_read_msr (dev,
+-						     GRUB_CS5536_MSR_DIVIL_RESET) 
++						     GRUB_CS5536_MSR_DIVIL_RESET)
+ 			       | 1);
+ 	break;
+       }
+diff --git a/grub-core/lib/mips/relocator.c b/grub-core/lib/mips/relocator.c
+index 743b213..773f3b7 100644
+--- a/grub-core/lib/mips/relocator.c
++++ b/grub-core/lib/mips/relocator.c
+@@ -103,7 +103,7 @@ grub_cpu_relocator_forward (void *ptr0, void *src, void *dest,
+   write_reg (8, (grub_uint32_t) src, &ptr);
+   write_reg (9, (grub_uint32_t) dest, &ptr);
+   write_reg (10, (grub_uint32_t) size, &ptr);
+-  grub_memcpy (ptr, &grub_relocator_forward_start, 
++  grub_memcpy (ptr, &grub_relocator_forward_start,
+ 	       RELOCATOR_SRC_SIZEOF (forward));
+ }
+ 
+diff --git a/grub-core/lib/posix_wrap/ctype.h b/grub-core/lib/posix_wrap/ctype.h
+index 38b5727..67bcaac 100644
+--- a/grub-core/lib/posix_wrap/ctype.h
++++ b/grub-core/lib/posix_wrap/ctype.h
+@@ -27,13 +27,13 @@ toupper (int c)
+   return grub_toupper (c);
+ }
+ 
+-static inline int 
++static inline int
+ isspace (int c)
+ {
+   return grub_isspace (c);
+ }
+ 
+-static inline int 
++static inline int
+ isdigit (int c)
+ {
+   return grub_isdigit (c);
+@@ -63,19 +63,19 @@ isxdigit (int c)
+   return grub_isxdigit (c);
+ }
+ 
+-static inline int 
++static inline int
+ isprint (int c)
+ {
+   return grub_isprint (c);
+ }
+ 
+-static inline int 
++static inline int
+ iscntrl (int c)
+ {
+   return !grub_isprint (c);
+ }
+ 
+-static inline int 
++static inline int
+ isgraph (int c)
+ {
+   return grub_isprint (c) && !grub_isspace (c);
+@@ -87,13 +87,13 @@ isalnum (int c)
+   return grub_isalpha (c) || grub_isdigit (c);
+ }
+ 
+-static inline int 
++static inline int
+ ispunct (int c)
+ {
+   return grub_isprint (c) && !grub_isspace (c) && !isalnum (c);
+ }
+ 
+-static inline int 
++static inline int
+ isalpha (int c)
+ {
+   return grub_isalpha (c);
+diff --git a/grub-core/lib/posix_wrap/stdlib.h b/grub-core/lib/posix_wrap/stdlib.h
+index 4634db0..e5093a9 100644
+--- a/grub-core/lib/posix_wrap/stdlib.h
++++ b/grub-core/lib/posix_wrap/stdlib.h
+@@ -23,7 +23,7 @@
+ #include <grub/misc.h>
+ #include <grub/safemath.h>
+ 
+-static inline void 
++static inline void
+ free (void *ptr)
+ {
+   grub_free (ptr);
+diff --git a/grub-core/lib/posix_wrap/string.h b/grub-core/lib/posix_wrap/string.h
+index 7ae6eee..1adb450 100644
+--- a/grub-core/lib/posix_wrap/string.h
++++ b/grub-core/lib/posix_wrap/string.h
+@@ -30,13 +30,13 @@ strlen (const char *s)
+   return grub_strlen (s);
+ }
+ 
+-static inline int 
++static inline int
+ strcmp (const char *s1, const char *s2)
+ {
+   return grub_strcmp (s1, s2);
+ }
+ 
+-static inline int 
++static inline int
+ strcasecmp (const char *s1, const char *s2)
+ {
+   return grub_strcasecmp (s1, s2);
+diff --git a/grub-core/lib/posix_wrap/wctype.h b/grub-core/lib/posix_wrap/wctype.h
+index 3771dc5..cc9faf5 100644
+--- a/grub-core/lib/posix_wrap/wctype.h
++++ b/grub-core/lib/posix_wrap/wctype.h
+@@ -37,7 +37,7 @@ static inline wctype_t
+ wctype (const char *name)
+ {
+   wctype_t i;
+-  static const char names[][10] = { "", 
++  static const char names[][10] = { "",
+ 				    "alnum", "cntrl", "lower",
+ 				    "space", "alpha", "digit",
+ 				    "print", "upper", "blank",
+diff --git a/grub-core/lib/powerpc/relocator.c b/grub-core/lib/powerpc/relocator.c
+index 8ffb8b6..15aeb02 100644
+--- a/grub-core/lib/powerpc/relocator.c
++++ b/grub-core/lib/powerpc/relocator.c
+@@ -55,7 +55,7 @@ static void
+ write_reg (int regn, grub_uint32_t val, void **target)
+ {
+   /* lis r, val >> 16  */
+-  *(grub_uint32_t *) *target = 
++  *(grub_uint32_t *) *target =
+     ((0x3c00 | (regn << 5)) << 16) | (val >> 16);
+   *target = ((grub_uint32_t *) *target) + 1;
+   /* ori r, r, val & 0xffff. */
+@@ -99,7 +99,7 @@ grub_cpu_relocator_forward (void *ptr0, void *src, void *dest,
+   write_reg (8, (grub_uint32_t) src, &ptr);
+   write_reg (9, (grub_uint32_t) dest, &ptr);
+   write_reg (10, (grub_uint32_t) size, &ptr);
+-  grub_memcpy (ptr, &grub_relocator_forward_start, 
++  grub_memcpy (ptr, &grub_relocator_forward_start,
+ 	       RELOCATOR_SRC_SIZEOF (forward));
+ }
+ 
+diff --git a/grub-core/lib/priority_queue.c b/grub-core/lib/priority_queue.c
+index 7d5e7c0..ba59dda 100644
+--- a/grub-core/lib/priority_queue.c
++++ b/grub-core/lib/priority_queue.c
+@@ -139,7 +139,7 @@ void
+ grub_priority_queue_pop (grub_priority_queue_t pq)
+ {
+   grub_size_t p;
+-  
++
+   swap (pq, 0, pq->used - 1);
+   pq->used--;
+   for (p = 0; left_child (p) < pq->used; )
+diff --git a/grub-core/lib/reed_solomon.c b/grub-core/lib/reed_solomon.c
+index 79037c0..4657a13 100644
+--- a/grub-core/lib/reed_solomon.c
++++ b/grub-core/lib/reed_solomon.c
+@@ -265,7 +265,7 @@ rs_recover (gf_single_t *mm, grub_size_t s, grub_size_t rs)
+       sigma[i] = 0;
+ 
+     gauss_solve (eqstat, rs2, rs2, sigma);
+-  } 
++  }
+ 
+   for (i = 0; i < (int) (rs + s); i++)
+     if (pol_evaluate (sigma, rs2 - 1, 255 - i) == gf_powx[i])
+@@ -338,7 +338,7 @@ encode_block (gf_single_t *ptr, grub_size_t s,
+       for (j = 0; j < ds; j++)
+ 	m[j] = ptr[SECTOR_SIZE * j + i];
+       rs_encode (m, ds, rr);
+-      for (j = 0; j < rr; j++)      
++      for (j = 0; j < rr; j++)
+ 	rptr[SECTOR_SIZE * j + i] = m[j + ds];
+       free (m);
+     }
+@@ -473,7 +473,7 @@ main (int argc, char **argv)
+ 
+   buf = xmalloc (s + rs + SECTOR_SIZE);
+   fread (buf, 1, s + rs, out);
+-  fclose (out);  
++  fclose (out);
+ #endif
+ #if 1
+   grub_memset (buf + 512 * 15, 0, 512);
+diff --git a/grub-core/lib/relocator.c b/grub-core/lib/relocator.c
+index f2c1944..68ef128 100644
+--- a/grub-core/lib/relocator.c
++++ b/grub-core/lib/relocator.c
+@@ -108,7 +108,7 @@ grub_relocator_new (void)
+   ret = grub_zalloc (sizeof (struct grub_relocator));
+   if (!ret)
+     return NULL;
+-    
++
+   ret->postchunks = ~(grub_phys_addr_t) 0;
+   ret->relocators_size = grub_relocator_jumper_size;
+   grub_dprintf ("relocator", "relocators_size=%lu\n",
+@@ -139,7 +139,7 @@ allocate_regstart (grub_phys_addr_t addr, grub_size_t size, grub_mm_region_t rb,
+   grub_mm_header_t new_header;
+   grub_mm_header_t hb = (grub_mm_header_t) (rb + 1);
+ 
+-#ifdef DEBUG_RELOCATOR_NOMEM_DPRINTF  
++#ifdef DEBUG_RELOCATOR_NOMEM_DPRINTF
+   grub_dprintf ("relocator", "ra = %p, rb = %p\n", regancestor, rb);
+ #endif
+   newreg_start = ALIGN_UP (newreg_raw_start, GRUB_MM_ALIGN);
+@@ -163,7 +163,7 @@ allocate_regstart (grub_phys_addr_t addr, grub_size_t size, grub_mm_region_t rb,
+     {
+       new_header = hb->next;
+       if (new_header == hb)
+-	new_header = (void *) (newreg_start + sizeof (*rb));	    
++	new_header = (void *) (newreg_start + sizeof (*rb));
+     }
+   {
+     struct grub_mm_header *newregfirst = rb->first;
+@@ -212,7 +212,7 @@ allocate_inreg (grub_phys_addr_t paddr, grub_size_t size,
+ 		(unsigned long) paddr, (unsigned long) size, hb, hbp,
+ 		rb, (unsigned long) vaddr);
+ #endif
+-    
++
+   if (ALIGN_UP (vaddr + size, GRUB_MM_ALIGN) + GRUB_MM_ALIGN
+       <= (grub_addr_t) (hb + hb->size))
+     {
+@@ -246,7 +246,7 @@ allocate_inreg (grub_phys_addr_t paddr, grub_size_t size,
+ 	}
+       else
+ 	foll = hb->next;
+-	
++
+       hbp->next = foll;
+       if (rb->first == hb)
+ 	{
+@@ -409,7 +409,7 @@ free_subchunk (const struct grub_relocator_subchunk *subchu)
+       }
+       break;
+ #endif
+-    }  
++    }
+ }
+ 
+ static int
+@@ -439,7 +439,7 @@ malloc_in_range (struct grub_relocator *rel,
+   if (end < start + size)
+     return 0;
+ 
+-  /* We have to avoid any allocations when filling scanline events. 
++  /* We have to avoid any allocations when filling scanline events.
+      Hence 2-stages.
+    */
+   for (r = grub_mm_base; r; r = r->next)
+@@ -527,7 +527,7 @@ malloc_in_range (struct grub_relocator *rel,
+     {
+ #ifdef DEBUG_RELOCATOR_NOMEM_DPRINTF
+       grub_dprintf ("relocator", "Blocking at 0x%lx-0x%lx\n",
+-		    (unsigned long) r - r->pre_size, 
++		    (unsigned long) r - r->pre_size,
+ 		    (unsigned long) (r + 1) + r->size);
+ #endif
+       events[N].type = FIRMWARE_BLOCK_START;
+@@ -596,7 +596,7 @@ malloc_in_range (struct grub_relocator *rel,
+       p = pa->next;
+       if (p->magic == GRUB_MM_ALLOC_MAGIC)
+ 	continue;
+-      do 
++      do
+ 	{
+ 	  if (p->magic != GRUB_MM_FREE_MAGIC)
+ 	    grub_fatal ("%s:%d free magic broken at %p (0x%x)\n",
+@@ -654,12 +654,12 @@ malloc_in_range (struct grub_relocator *rel,
+       {
+ 	grub_memset (counter, 0, (1 + (1 << DIGITSORT_BITS)) * sizeof (counter[0]));
+ 	for (j = 0; j < N; j++)
+-	  counter[((events[j].pos >> (DIGITSORT_BITS * i)) 
++	  counter[((events[j].pos >> (DIGITSORT_BITS * i))
+ 		   & DIGITSORT_MASK) + 1]++;
+ 	for (j = 0; j <= DIGITSORT_MASK; j++)
+ 	  counter[j+1] += counter[j];
+ 	for (j = 0; j < N; j++)
+-	  eventt[counter[((events[j].pos >> (DIGITSORT_BITS * i)) 
++	  eventt[counter[((events[j].pos >> (DIGITSORT_BITS * i))
+ 			  & DIGITSORT_MASK)]++] = events[j];
+ 	t = eventt;
+ 	eventt = events;
+@@ -680,7 +680,7 @@ malloc_in_range (struct grub_relocator *rel,
+     const int nlefto = 0;
+ #endif
+     grub_addr_t starta = 0;
+-    for (j = from_low_priv ? 0 : N - 1; from_low_priv ? j < N : (j + 1); 
++    for (j = from_low_priv ? 0 : N - 1; from_low_priv ? j < N : (j + 1);
+ 	 from_low_priv ? j++ : j--)
+       {
+ 	int isinsidebefore, isinsideafter;
+@@ -734,7 +734,7 @@ malloc_in_range (struct grub_relocator *rel,
+ 	    nstarted--;
+ 	    break;
+ 	  }
+-	isinsideafter = (!ncollisions && (nstarted || ((nlefto || nstartedfw) 
++	isinsideafter = (!ncollisions && (nstarted || ((nlefto || nstartedfw)
+ 						       && !nblockfw)));
+ 	if (from_low_priv) {
+ 	  if (!isinsidebefore && isinsideafter)
+@@ -847,13 +847,13 @@ malloc_in_range (struct grub_relocator *rel,
+ 		      fend
+ 			= ALIGN_UP (alloc_end,
+ 				    GRUB_RELOCATOR_FIRMWARE_REQUESTS_QUANT);
+-#ifdef DEBUG_RELOCATOR_NOMEM_DPRINTF  
++#ifdef DEBUG_RELOCATOR_NOMEM_DPRINTF
+ 		      grub_dprintf ("relocator", "requesting %lx-%lx\n",
+ 				    (unsigned long) fstart,
+ 				    (unsigned long) fend);
+ #endif
+ 		      /* The failure here can be very expensive.  */
+-		      if (!grub_relocator_firmware_alloc_region (fstart, 
++		      if (!grub_relocator_firmware_alloc_region (fstart,
+ 								 fend - fstart))
+ 			{
+ 			  if (from_low_priv)
+@@ -889,7 +889,7 @@ malloc_in_range (struct grub_relocator *rel,
+ 		nallocs++;
+ 	      }
+ 	  }
+-	  
++
+ 	switch (events[j].type)
+ 	  {
+ 	  case REG_BEG_START:
+@@ -1201,7 +1201,7 @@ malloc_in_range (struct grub_relocator *rel,
+ }
+ 
+ static void
+-adjust_limits (struct grub_relocator *rel, 
++adjust_limits (struct grub_relocator *rel,
+ 	       grub_phys_addr_t *min_addr, grub_phys_addr_t *max_addr,
+ 	       grub_phys_addr_t in_min, grub_phys_addr_t in_max)
+ {
+@@ -1296,9 +1296,9 @@ grub_relocator_alloc_chunk_addr (struct grub_relocator *rel,
+     {
+       if (rel->highestnonpostaddr < target + size)
+ 	rel->highestnonpostaddr = target + size;
+-      
++
+       if (rel->highestnonpostaddr < chunk->src + size)
+-	rel->highestnonpostaddr = chunk->src + size;  
++	rel->highestnonpostaddr = chunk->src + size;
+     }
+ 
+   grub_dprintf ("relocator", "relocators_size=%ld\n",
+@@ -1508,7 +1508,7 @@ grub_relocator_unload (struct grub_relocator *rel)
+   for (chunk = rel->chunks; chunk; chunk = next)
+     {
+       unsigned i;
+-      for (i = 0; i < chunk->nsubchunks; i++) 
++      for (i = 0; i < chunk->nsubchunks; i++)
+ 	free_subchunk (&chunk->subchunks[i]);
+       grub_unmap_memory (chunk->srcv, chunk->size);
+       next = chunk->next;
+@@ -1543,7 +1543,7 @@ grub_relocator_prepare_relocs (struct grub_relocator *rel, grub_addr_t addr,
+     *relsize = rel->relocators_size;
+ 
+   grub_dprintf ("relocator", "Relocs allocated at %p\n", movers_chunk.srcv);
+-  
++
+   {
+     unsigned i;
+     grub_size_t count[257];
+@@ -1555,7 +1555,7 @@ grub_relocator_prepare_relocs (struct grub_relocator *rel, grub_addr_t addr,
+         struct grub_relocator_chunk *chunk;
+ 	for (chunk = rel->chunks; chunk; chunk = chunk->next)
+ 	  {
+-	    grub_dprintf ("relocator", "chunk %p->%p, 0x%lx\n", 
++	    grub_dprintf ("relocator", "chunk %p->%p, 0x%lx\n",
+ 			  (void *) chunk->src, (void *) chunk->target,
+ 			  (unsigned long) chunk->size);
+ 	    nchunks++;
+@@ -1599,7 +1599,7 @@ grub_relocator_prepare_relocs (struct grub_relocator *rel, grub_addr_t addr,
+ 
+   for (j = 0; j < nchunks; j++)
+     {
+-      grub_dprintf ("relocator", "sorted chunk %p->%p, 0x%lx\n", 
++      grub_dprintf ("relocator", "sorted chunk %p->%p, 0x%lx\n",
+ 		    (void *) sorted[j].src, (void *) sorted[j].target,
+ 		    (unsigned long) sorted[j].size);
+       if (sorted[j].src < sorted[j].target)
+@@ -1641,7 +1641,7 @@ grub_mm_check_real (const char *file, int line)
+       p = pa->next;
+       if (p->magic == GRUB_MM_ALLOC_MAGIC)
+ 	continue;
+-      do 
++      do
+ 	{
+ 	  if ((grub_addr_t) p < (grub_addr_t) (r + 1)
+ 	      || (grub_addr_t) p >= (grub_addr_t) (r + 1) + r->size)
+diff --git a/grub-core/lib/syslinux_parse.c b/grub-core/lib/syslinux_parse.c
+index ff244d2..ae61a96 100644
+--- a/grub-core/lib/syslinux_parse.c
++++ b/grub-core/lib/syslinux_parse.c
+@@ -51,8 +51,8 @@ struct syslinux_menuentry
+   char hotkey;
+   int make_default;
+   struct syslinux_say *say;
+-  
+-  enum { KERNEL_NO_KERNEL, KERNEL_LINUX, KERNEL_CHAINLOADER, 
++
++  enum { KERNEL_NO_KERNEL, KERNEL_LINUX, KERNEL_CHAINLOADER,
+ 	 KERNEL_BIN, KERNEL_PXE, KERNEL_CHAINLOADER_BPB,
+ 	 KERNEL_COM32, KERNEL_COM, KERNEL_IMG, KERNEL_CONFIG, LOCALBOOT }
+     entry_type;
+@@ -170,7 +170,7 @@ print_num (struct output_buffer *outbuf, int n)
+ {
+   char buf[20];
+   grub_snprintf (buf, sizeof (buf), "%d", n);
+-  return print (outbuf, buf, grub_strlen (buf)); 
++  return print (outbuf, buf, grub_strlen (buf));
+ }
+ 
+ static grub_err_t
+@@ -233,7 +233,7 @@ kernel (const char *line, struct syslinux_menu *menu)
+ 
+   if (end - line >= 4 && grub_strcasecmp (end - 4, ".img") == 0)
+     menu->entries->entry_type = KERNEL_IMG;
+-  
++
+   return GRUB_ERR_NONE;
+ }
+ 
+@@ -247,7 +247,7 @@ cmd_linux (const char *line, struct syslinux_menu *menu)
+   if (!menu->entries->kernel_file)
+     return grub_errno;
+   menu->entries->entry_type = KERNEL_LINUX;
+-  
++
+   return GRUB_ERR_NONE;
+ }
+ 
+@@ -261,7 +261,7 @@ cmd_boot (const char *line, struct syslinux_menu *menu)
+   if (!menu->entries->kernel_file)
+     return grub_errno;
+   menu->entries->entry_type = KERNEL_CHAINLOADER;
+-  
++
+   return GRUB_ERR_NONE;
+ }
+ 
+@@ -275,7 +275,7 @@ cmd_bss (const char *line, struct syslinux_menu *menu)
+   if (!menu->entries->kernel_file)
+     return grub_errno;
+   menu->entries->entry_type = KERNEL_CHAINLOADER_BPB;
+-  
++
+   return GRUB_ERR_NONE;
+ }
+ 
+@@ -289,7 +289,7 @@ cmd_pxe (const char *line, struct syslinux_menu *menu)
+   if (!menu->entries->kernel_file)
+     return grub_errno;
+   menu->entries->entry_type = KERNEL_PXE;
+-  
++
+   return GRUB_ERR_NONE;
+ }
+ 
+@@ -303,7 +303,7 @@ cmd_fdimage (const char *line, struct syslinux_menu *menu)
+   if (!menu->entries->kernel_file)
+     return grub_errno;
+   menu->entries->entry_type = KERNEL_IMG;
+-  
++
+   return GRUB_ERR_NONE;
+ }
+ 
+@@ -317,7 +317,7 @@ cmd_comboot (const char *line, struct syslinux_menu *menu)
+   if (!menu->entries->kernel_file)
+     return grub_errno;
+   menu->entries->entry_type = KERNEL_COM;
+-  
++
+   return GRUB_ERR_NONE;
+ }
+ 
+@@ -331,7 +331,7 @@ cmd_com32 (const char *line, struct syslinux_menu *menu)
+   if (!menu->entries->kernel_file)
+     return grub_errno;
+   menu->entries->entry_type = KERNEL_COM32;
+-  
++
+   return GRUB_ERR_NONE;
+ }
+ 
+@@ -354,7 +354,7 @@ cmd_config (const char *line, struct syslinux_menu *menu)
+ 	return grub_errno;
+     }
+   menu->entries->entry_type = KERNEL_CONFIG;
+-  
++
+   return GRUB_ERR_NONE;
+ }
+ 
+@@ -367,7 +367,7 @@ cmd_append (const char *line, struct syslinux_menu *menu)
+   menu->entries->append = grub_strdup (line);
+   if (!menu->entries->append)
+     return grub_errno;
+-  
++
+   return GRUB_ERR_NONE;
+ }
+ 
+@@ -405,7 +405,7 @@ cmd_initrd (const char *line, struct syslinux_menu *menu)
+       while (*line == ',')
+ 	line++;
+     }
+-  
++
+   return GRUB_ERR_NONE;
+ }
+ 
+@@ -415,7 +415,7 @@ cmd_default (const char *line, struct syslinux_menu *menu)
+   menu->def = grub_strdup (line);
+   if (!menu->def)
+     return grub_errno;
+-  
++
+   return GRUB_ERR_NONE;
+ }
+ 
+@@ -423,7 +423,7 @@ static grub_err_t
+ cmd_timeout (const char *line, struct syslinux_menu *menu)
+ {
+   menu->timeout = grub_strtoul (line, NULL, 0);
+-  
++
+   return GRUB_ERR_NONE;
+ }
+ 
+@@ -434,7 +434,7 @@ cmd_menudefault (const char *line __attribute__ ((unused)),
+   if (!menu->entries)
+     return grub_error (GRUB_ERR_BAD_ARGUMENT, "kernel without label");
+ 
+-  menu->entries->make_default = 1; 
++  menu->entries->make_default = 1;
+   return GRUB_ERR_NONE;
+ }
+ 
+@@ -457,7 +457,7 @@ cmd_localboot (const char *line,
+   if (!menu->entries->kernel_file)
+     return grub_errno;
+   menu->entries->entry_type = LOCALBOOT;
+-  
++
+   return GRUB_ERR_NONE;
+ }
+ 
+@@ -485,7 +485,7 @@ cmd_extlabel (const char *line, struct syslinux_menu *menu)
+       *out++ = *in++;
+     }
+   *out = 0;
+-  
++
+   return GRUB_ERR_NONE;
+ }
+ 
+@@ -548,7 +548,7 @@ syslinux_parse (const char *filename,
+   ret = syslinux_parse_real (menu);
+   if (ret == GRUB_ERR_FILE_NOT_FOUND
+       || ret == GRUB_ERR_BAD_FILENAME)
+-    {	
++    {
+       grub_errno = ret = GRUB_ERR_NONE;
+       add_comment (menu, "# File ", 0);
+       add_comment (menu, nf, 0);
+@@ -765,7 +765,7 @@ syslinux_parse_real (struct syslinux_menu *menu)
+ }
+ 
+ static grub_err_t
+-print_escaped (struct output_buffer *outbuf, 
++print_escaped (struct output_buffer *outbuf,
+ 	       const char *from, const char *to)
+ {
+   const char *ptr;
+@@ -1040,7 +1040,7 @@ write_entry (struct output_buffer *outbuf,
+     case KERNEL_COM:
+       {
+ 	char *basename = NULL;
+-	
++
+ 	{
+ 	  char *ptr;
+ 	  for (ptr = curentry->kernel_file; *ptr; ptr++)
+@@ -1247,8 +1247,8 @@ write_entry (struct output_buffer *outbuf,
+ 	if (grub_strcasecmp (basename, "whichsys.c32") == 0)
+ 	  {
+ 	    grub_syslinux_flavour_t flavour = GRUB_SYSLINUX_ISOLINUX;
+-	    const char *flav[] = 
+-	      { 
++	    const char *flav[] =
++	      {
+ 		[GRUB_SYSLINUX_ISOLINUX] = "iso",
+ 		[GRUB_SYSLINUX_PXELINUX] = "pxe",
+ 		[GRUB_SYSLINUX_SYSLINUX] = "sys"
+@@ -1419,7 +1419,7 @@ free_menu (struct syslinux_menu *menu)
+ 	  grub_free (initrd->file);
+ 	  grub_free (initrd);
+ 	}
+- 
++
+       grub_free (entry->comments);
+       grub_free (entry->kernel_file);
+       grub_free (entry->label);
+@@ -1507,7 +1507,7 @@ config_file (struct output_buffer *outbuf,
+ 	  print_string ("\n");
+ 	}
+       for (curentry = lentry; curentry; curentry = curentry->prev)
+-	{      
++	{
+ 	  print_string ("menuentry ");
+ 	  err = print_escaped (outbuf,
+ 			       curentry->extlabel ? : curentry->label, NULL);
+diff --git a/grub-core/lib/xzembed/xz_dec_stream.c b/grub-core/lib/xzembed/xz_dec_stream.c
+index a29751e..832d8af 100644
+--- a/grub-core/lib/xzembed/xz_dec_stream.c
++++ b/grub-core/lib/xzembed/xz_dec_stream.c
+@@ -381,7 +381,7 @@ static enum xz_ret hash_validate(struct xz_dec *s, struct xz_buf *b,
+ {
+ #ifndef GRUB_EMBED_DECOMPRESSOR
+ 	const gcry_md_spec_t *hash = crc32 ? s->crc32 : s->hash;
+-	void *hash_context = crc32 ? s->crc32_context 
++	void *hash_context = crc32 ? s->crc32_context
+ 		: s->hash_context;
+ 	if(!s->have_hash_value && hash
+ 		&& sizeof (s->hash_value) >= hash->mdlen)
+@@ -512,7 +512,7 @@ static enum xz_ret dec_stream_header(struct xz_dec *s)
+ 				kfree(s->crc32_context);
+ 				return XZ_MEMLIMIT_ERROR;
+ 			}
+-			
++
+ 			s->index.hash.hash_context = kmalloc(s->hash->contextsize,
+ 							     GFP_KERNEL);
+ 			if (s->index.hash.hash_context == NULL)
+@@ -521,7 +521,7 @@ static enum xz_ret dec_stream_header(struct xz_dec *s)
+ 				kfree(s->crc32_context);
+ 				return XZ_MEMLIMIT_ERROR;
+ 			}
+-			
++
+ 			s->block.hash.hash_context = kmalloc(s->hash->contextsize, GFP_KERNEL);
+ 			if (s->block.hash.hash_context == NULL)
+ 			{

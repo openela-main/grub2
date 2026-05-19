@@ -16,7 +16,7 @@
 Name:                 grub2
 Epoch:                1
 Version:              2.06
-Release:              114%{?dist}.2.openela.0.2
+Release:              126%{?dist}.openela.0.2
 Summary:              Bootloader with support for Linux, Multiboot and more
 License:              GPLv3+
 URL:                  http://www.gnu.org/software/grub/
@@ -35,13 +35,18 @@ Source10:             20-grub.install
 Source11:             grub.patches
 Source12:             sbat.csv.in
 Source13:             gen_grub_cfgstub
+Source14:             sbat.ppc.csv
 
 
 %include %{SOURCE1}
 
-%ifarch x86_64 aarch64 ppc64le
+%ifarch x86_64 aarch64
 %define sb_ca		%{_datadir}/pki/sb-certs/secureboot-ca-%{_arch}.cer
 %define sb_cer		%{_datadir}/pki/sb-certs/secureboot-grub2-%{_arch}.cer
+%endif
+%ifarch ppc64le
+%define sb_ca          %{_datadir}/pki/sb-certs/secureboot-ca-%{_arch}.cer
+%define sb_cer         %{_datadir}/pki/sb-certs/secureboot-kernel-%{_arch}.cer
 %endif
 
 %if 0%{?centos}
@@ -539,7 +544,7 @@ fi
 %endif
 
 %changelog
-* Tue May 05 2026 Release Engineering <releng@openela.org> - 2.06.openela.0.2
+* Tue May 19 2026 Release Engineering <releng@openela.org> - 2.06.openela.0.2
 - Removing redhat old cert sources entries (Sherif Nagy)
 - Preserving rhel8 sbat entry based on shim-review feedback ticket no. 194
 - Adding prod cert
@@ -549,17 +554,59 @@ fi
 - Adding OpenELA testing CA, CERT and sbat files
 - Use DER for ppc64le builds from openela-sb-certs (Louis Abel)
 
-* Wed Mar 11 2026 Josue Hernandez <josherna@redhat.com> 2.06-114.2
+* Mon Mar 09 2026 Josue Hernandez <josherna@redhat.com> 2.06-126
 - kern/efi/mm: Change grub_efi_mm_add_regions() to keep track of map allocation size
-- Resolves: #RHEL-155284
+- Resolves: #RHEL-148310
 
-* Thu Feb 19 2026 Therese Cornell <tcornell@redhat.com> - 2.06-114.1
-- Fixes CVE-2025-61662 Missing unregister call for gettext command may lead to use-after-free
-- Resolves: #RHEL-141593
+* Thu Mar 05 2026 Nicolas Frayer <nfrayer@redhat.com> 2.06-125
+- ppc64le/sbat: Add an sbat CSV file for ppc64le
+- Resolves: #RHEL-146555
 
-* Wed Oct 8 2025 Nicolas Frayer <nfrayer@redhat.com> 2.06-114
-- spec: Update signing key to redhatsecureboot802
-- Resolves: #RHEL-116729
+* Fri Feb 13 2026 Marta Lewandowska <mlewando@redhat.com> 2.06-124
+- ppc64le: Pointing to the right cert after redhat-release change
+- Related: #RHEL-24742
+
+* Fri Feb 06 2026 Nicolas Frayer <nfrayer@redhat.com> 2.06-123
+- ppc/mkimage/appendedsig: Upstream code sync for alignment and sbat
+- Related: #RHEL-24742
+
+* Wed Feb 04 2026 Nicolas Frayer <nfrayer@redhat.com> 2.06-122
+- Fix several security issues about module unloading and file handling
+- Resolved: #RHEL-141594
+- Resolves: #CVE-2025-54771 #CVE-2025-61661
+- Resolves: #CVE-2025-61662 #CVE-2025-61663 #CVE-2025-61664
+
+* Fri Dec 05 2025 Leo Sandoval <lsandova@redhat.com> 2.06-121
+- rpminspect: disable abidiff inspections
+- Resolves: #RHEL-106446
+
+* Wed Dec 03 2025 Nicolas Frayer <nfrayer@redhat.com> 2.06-120
+- appendedsig: Fix grub-mkimage with an unaligned appended signature size
+- Related: #RHEL-24742
+
+* Mon Nov 17 2025 Nicolas Frayer <nfrayer@redhat.com> 2.06-119
+- ieee1275: Upstream patches for appended signature support
+- Related: #RHEL-24742
+
+* Tue Nov 04 2025 Leo Sandoval <lsandova@redhat.com> 2.06-118
+- spec: Update RHEL x86_64 and aarch64 signing key to redhatsecureboot802
+- Resolves: #RHEL-126136
+
+* Fri Oct 31 2025 Leo Sandoval <lsandova@redhat.com> 2.06-117
+- Rebuilt to sign grub with new key
+- Resolves: #RHEL-124983
+
+* Tue Oct 28 2025 Leo Sandoval <lsandova@redhat.com> 2.06-116
+- Disable annobin stack protection check
+- Resolves: #RHEL-45712
+
+* Mon Sep 08 2025 Leo Sandoval <lsandova@redhat.com> 2.06-115
+- Fix the fallback mechanism when menu entries fail to boot
+- Resolves: RHEL-109456
+
+* Thu Aug 28 2025 Leo Sandoval <lsandova@redhat.com> 2.06-114
+- 20-grub.install: Skip BLS removal when entry type is type2
+- Resolves: #RHEL-108008
 
 * Thu Aug 7 2025 Nicolas Frayer <nfrayer@redhat.com> 2.06-113
 - sbat: add new sbat entry for centos

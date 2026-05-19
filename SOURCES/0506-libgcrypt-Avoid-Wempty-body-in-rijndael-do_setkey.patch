@@ -1,0 +1,36 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Heinrich Schuchardt <heinrich.schuchardt@canonical.com>
+Date: Fri, 13 Aug 2021 14:49:10 +0200
+Subject: [PATCH] libgcrypt: Avoid -Wempty-body in rijndael do_setkey()
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Avoid a warning
+
+  lib/libgcrypt-grub/cipher/rijndael.c:229:9:
+  warning: suggest braces around empty body in an ‘if’ statement [-Wempty-body]
+    229 |         ;
+        |         ^
+
+Signed-off-by: Heinrich Schuchardt <heinrich.schuchardt@canonical.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/lib/libgcrypt/cipher/rijndael.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/grub-core/lib/libgcrypt/cipher/rijndael.c b/grub-core/lib/libgcrypt/cipher/rijndael.c
+index 38e9a7c..b3effa2 100644
+--- a/grub-core/lib/libgcrypt/cipher/rijndael.c
++++ b/grub-core/lib/libgcrypt/cipher/rijndael.c
+@@ -228,7 +228,9 @@ do_setkey (RIJNDAEL_context *ctx, const byte *key, const unsigned keylen)
+       KC = 4;
+ 
+       if (0)
+-        ;
++        {
++          ;
++        }
+ #ifdef USE_PADLOCK
+       else if ((_gcry_get_hw_features () & HWF_PADLOCK_AES))
+         {

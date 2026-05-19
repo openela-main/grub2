@@ -1,0 +1,144 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Nicolas Frayer <nfrayer@redhat.com>
+Date: Fri, 14 Nov 2025 12:19:45 -0500
+Subject: [PATCH] Appended sig: Fix build
+
+Fixed some duplicates while merging upstream patches
+
+Signed-off-by: Nicolas Frayer <nfrayer@redhat.com>
+---
+ grub-core/Makefile.core.def                      |  9 ----
+ grub-core/commands/appendedsig/asn1util.c        |  2 +-
+ grub-core/commands/appendedsig/gnutls_asn1_tab.c |  2 +-
+ grub-core/commands/appendedsig/pkix_asn1_tab.c   |  2 +-
+ grub-core/lib/pkcs1_v15.c                        | 59 ------------------------
+ 5 files changed, 3 insertions(+), 71 deletions(-)
+ delete mode 100644 grub-core/lib/pkcs1_v15.c
+
+diff --git a/grub-core/Makefile.core.def b/grub-core/Makefile.core.def
+index c69d642..3e8ae8a 100644
+--- a/grub-core/Makefile.core.def
++++ b/grub-core/Makefile.core.def
+@@ -320,7 +320,6 @@ kernel = {
+   extra_dist = video/sis315_init.c;
+   mips_loongson = commands/keylayouts.c;
+ 
+-  powerpc_ieee1275 = kern/powerpc/ieee1275/ieee1275.c;
+   powerpc_ieee1275 = kern/powerpc/cache.S;
+   powerpc_ieee1275 = kern/powerpc/dl.c;
+   powerpc_ieee1275 = kern/powerpc/compiler-rt.S;
+@@ -2594,14 +2593,6 @@ module = {
+   cppflags = '$(CPPFLAGS_GCRY)';
+ };
+ 
+-module = {
+-  name = pkcs1_v15;
+-  common = lib/pkcs1_v15.c;
+-
+-  cflags = '$(CFLAGS_GCRY) -Wno-redundant-decls -Wno-sign-compare';
+-  cppflags = '$(CPPFLAGS_GCRY)';
+-};
+-
+ module = {
+   name = all_video;
+   common = lib/fake_module.c;
+diff --git a/grub-core/commands/appendedsig/asn1util.c b/grub-core/commands/appendedsig/asn1util.c
+index 9dd7898..1f50a74 100644
+--- a/grub-core/commands/appendedsig/asn1util.c
++++ b/grub-core/commands/appendedsig/asn1util.c
+@@ -17,7 +17,7 @@
+  *  along with GRUB.  If not, see <http://www.gnu.org/licenses/>.
+  */
+ 
+-#include <libtasn1.h>
++#include <grub/libtasn1.h>
+ #include <grub/types.h>
+ #include <grub/err.h>
+ #include <grub/mm.h>
+diff --git a/grub-core/commands/appendedsig/gnutls_asn1_tab.c b/grub-core/commands/appendedsig/gnutls_asn1_tab.c
+index efc0c14..16998f2 100644
+--- a/grub-core/commands/appendedsig/gnutls_asn1_tab.c
++++ b/grub-core/commands/appendedsig/gnutls_asn1_tab.c
+@@ -1,5 +1,5 @@
+ #include <grub/mm.h>
+-#include <libtasn1.h>
++#include <grub/libtasn1.h>
+ 
+ /*
+  * Imported from gnutls.asn.
+diff --git a/grub-core/commands/appendedsig/pkix_asn1_tab.c b/grub-core/commands/appendedsig/pkix_asn1_tab.c
+index ec5f87b..fdc989a 100644
+--- a/grub-core/commands/appendedsig/pkix_asn1_tab.c
++++ b/grub-core/commands/appendedsig/pkix_asn1_tab.c
+@@ -1,5 +1,5 @@
+ #include <grub/mm.h>
+-#include <libtasn1.h>
++#include <grub/libtasn1.h>
+ 
+ /*
+  * Imported from pkix.asn.
+diff --git a/grub-core/lib/pkcs1_v15.c b/grub-core/lib/pkcs1_v15.c
+deleted file mode 100644
+index dbacd56..0000000
+--- a/grub-core/lib/pkcs1_v15.c
++++ /dev/null
+@@ -1,59 +0,0 @@
+-/*
+- *  GRUB  --  GRand Unified Bootloader
+- *  Copyright (C) 2013  Free Software Foundation, Inc.
+- *
+- *  GRUB is free software: you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation, either version 3 of the License, or
+- *  (at your option) any later version.
+- *
+- *  GRUB is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with GRUB.  If not, see <http://www.gnu.org/licenses/>.
+- */
+-
+-#include <grub/dl.h>
+-#include <grub/gcrypt/gcrypt.h>
+-
+-GRUB_MOD_LICENSE ("GPLv3+");
+-
+-/*
+- * Given a hash value 'hval', of hash specification 'hash', perform
+- * the EMSA-PKCS1-v1_5 padding suitable for a key with modulus 'mod'
+- * (see RFC 8017 s 9.2) and place the result in 'hmpi'.
+- */
+-gcry_err_code_t
+-grub_crypto_rsa_pad (gcry_mpi_t * hmpi, grub_uint8_t * hval,
+-		     const gcry_md_spec_t * hash, gcry_mpi_t mod)
+-{
+-  grub_size_t tlen, emlen, fflen;
+-  grub_uint8_t *em, *emptr;
+-  unsigned nbits = gcry_mpi_get_nbits (mod);
+-  int ret;
+-  tlen = hash->mdlen + hash->asnlen;
+-  emlen = (nbits + 7) / 8;
+-  if (emlen < tlen + 11)
+-    return GPG_ERR_TOO_SHORT;
+-
+-  em = grub_malloc (emlen);
+-  if (!em)
+-    return 1;
+-
+-  em[0] = 0x00;
+-  em[1] = 0x01;
+-  fflen = emlen - tlen - 3;
+-  for (emptr = em + 2; emptr < em + 2 + fflen; emptr++)
+-    *emptr = 0xff;
+-  *emptr++ = 0x00;
+-  grub_memcpy (emptr, hash->asnoid, hash->asnlen);
+-  emptr += hash->asnlen;
+-  grub_memcpy (emptr, hval, hash->mdlen);
+-
+-  ret = gcry_mpi_scan (hmpi, GCRYMPI_FMT_USG, em, emlen, 0);
+-  grub_free (em);
+-  return ret;
+-}
