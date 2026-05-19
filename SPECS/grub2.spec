@@ -17,7 +17,7 @@
 Name:		grub2
 Epoch:		1
 Version:	2.12
-Release:	29%{?dist}.3
+Release:	46%{?dist}
 Summary:	Bootloader with support for Linux, Multiboot and more
 License:	GPL-3.0-or-later
 URL:		http://www.gnu.org/software/grub/
@@ -36,12 +36,21 @@ Source10:	20-grub.install
 Source11:	grub.patches
 Source12:	sbat.csv.in
 Source13:	gen_grub_cfgstub
+Source14:	sbat.ppc.csv
+Source15:	grub-cc.macros
+Source16:	grub-cc.cfg
+Source17:	grub-cc-prefix-embedded.cfg
 
 %include %{SOURCE1}
+%include %{SOURCE15}
 
-%ifarch x86_64 aarch64 ppc64le
+%ifarch x86_64 aarch64
 %define sb_ca		%{_datadir}/pki/sb-certs/secureboot-ca-%{_arch}.cer
 %define sb_cer		%{_datadir}/pki/sb-certs/secureboot-grub2-%{_arch}.cer
+%endif
+%ifarch ppc64le
+%define sb_ca          %{_datadir}/pki/sb-certs/secureboot-ca-%{_arch}.cer
+%define sb_cer         %{_datadir}/pki/sb-certs/secureboot-kernel-%{_arch}.cer
 %endif
 
 %if 0%{?centos}
@@ -173,6 +182,7 @@ This subpackage provides tools for support of all platforms.
 
 %if 0%{with_efi_arch}
 %{expand:%define_efi_variant %%{package_arch} -o}
+%{expand:%define_efi_cc_variant %%{package_arch} -o}
 %endif
 %if 0%{with_alt_efi_arch}
 %{expand:%define_efi_variant %%{alt_package_arch}}
@@ -208,6 +218,12 @@ cp %{SOURCE4} grub-%{grubefiarch}-%{tarversion}/unifont.pcf.gz
 sed -e "s,@@VERSION@@,%{version},g" -e "s,@@VERSION_RELEASE@@,%{version}-%{release},g" \
     %{SOURCE12} > grub-%{grubefiarch}-%{tarversion}/sbat.csv
 git add grub-%{grubefiarch}-%{tarversion}
+mkdir grub-%{grubefiarch}-%{tarversion}-cc
+grep -A100000 '# stuff "make" creates' .gitignore > grub-%{grubefiarch}-%{tarversion}-cc/.gitignore
+cp %{SOURCE4} grub-%{grubefiarch}-%{tarversion}-cc/unifont.pcf.gz
+sed -e "s,@@VERSION@@,%{version},g" -e "s,@@VERSION_RELEASE@@,%{version}-%{release},g" \
+    %{SOURCE12} > grub-%{grubefiarch}-%{tarversion}-cc/sbat.csv
+git add grub-%{grubefiarch}-%{tarversion}-cc
 %endif
 %if 0%{with_alt_efi_arch}
 mkdir grub-%{grubaltefiarch}-%{tarversion}
@@ -232,6 +248,7 @@ git commit -m "After making subdirs"
 %build
 %if 0%{with_efi_arch}
 %{expand:%do_primary_efi_build %%{grubefiarch} %%{grubefiname} %%{grubeficdname} %%{_target_platform} %%{efi_target_cflags} %%{efi_host_cflags} %{sb_ca} %{sb_cer} %{sb_key}}
+%{expand:%do_primary_efi_cc_build %%{grubefiarch} %%{grubeficcname} %%{grubeficccdname} %%{_target_platform} %%{efi_target_cflags} %%{efi_host_cflags} %{sb_ca} %{sb_cer} %{sb_key}}
 %endif
 %if 0%{with_alt_efi_arch}
 %{expand:%do_alt_efi_build %%{grubaltefiarch} %%{grubaltefiname} %%{grubalteficdname} %%{_alt_target_platform} %%{alt_efi_target_cflags} %%{alt_efi_host_cflags} %{sb_ca} %{sb_cer} %{sb_key}}
@@ -261,6 +278,7 @@ rm -fr $RPM_BUILD_ROOT
 %do_common_install
 %if 0%{with_efi_arch}
 %{expand:%do_efi_install %%{grubefiarch} %%{grubefiname} %%{grubeficdname}}
+%{expand:%do_efi_cc_install %%{grubefiarch} %%{grubeficcname} %%{grubeficccdname}}
 %endif
 %if 0%{with_alt_efi_arch}
 %{expand:%do_alt_efi_install %%{grubaltefiarch} %%{grubaltefiname} %%{grubalteficdname}}
@@ -555,6 +573,7 @@ fi
 
 %if 0%{with_efi_arch}
 %{expand:%define_efi_variant_files %%{package_arch} %%{grubefiname} %%{grubeficdname} %%{grubefiarch} %%{target_cpu_name} %%{grub_target_name}}
+%{expand:%define_efi_cc_variant_files %%{package_arch} %%{grubeficcname} %%{grubeficccdname} %%{grubefiarch} %%{target_cpu_name} %%{grub_target_name}}
 %endif
 %if 0%{with_alt_efi_arch}
 %{expand:%define_efi_variant_files %%{alt_package_arch} %%{grubaltefiname} %%{grubalteficdname} %%{grubaltefiarch} %%{alt_target_cpu_name} %%{alt_grub_target_name}}
@@ -574,21 +593,80 @@ fi
 %endif
 
 %changelog
-* Wed Mar 11 2026 Josue Hernandez <josherna@redhat.com> - 2.12-29.3
-- kern/efi/mm: Change grub_efi_mm_add_regions() to keep track of map allocation size
-- Resolves: #RHEL-155287
+* Fri Mar 27 2026 Leo Sandoval <lsandova@redhat.com> - 2.12-46
+- New package grub2-efi-x64-cc for confidential computing workloads
+- Resolves: #RHEL-127909
 
-* Tue Mar 03 2026 Nicolas Frayer <nfrayer@redhat.com> - 2.12-29.2
+* Tue Mar 10 2026 Marta Lewandowska <mlewando@redhat.com> - 2.12-45
 - Try to get gating tests running via fmf/tmt
-- Resolves: #RHEL-152849
+- Resolves: #RHEL-147757
 
-* Thu Feb 19 2026 Therese Cornell <tcornell@redhat.com> - 2.12-29.1
-- Fixes CVE-2025-61662 Missing unregister call for gettext command may lead to use-after-free
-- Resolves: #RHEL-141580
+* Mon Mar 09 2026 Josue Hernandez <josherna@redhat.com> 2.12-44
+- kern/efi/mm: Change grub_efi_mm_add_regions() to keep track of map allocation size
+- Resolves: #RHEL-148309
 
-* Wed Oct 8 2025 Nicolas Frayer <nfrayer@redhat.com> 2.12-29
+* Mon Mar 09 2026 Nicolas Frayer <nfrayer@redhat.com> 2.12-43
+- Bump release
+- Related: #RHEL-146590
+
+* Thu Feb 26 2026 Nicolas Frayer <nfrayer@redhat.com> 2.12-42
+- ppc64le/sbat: Add an sbat CSV file for ppc64le
+- Resolves: #RHEL-146590
+
+* Fri Feb 13 2026 Marta Lewandowska <mlewando@redhat.com> 2.12-41
+- ppc64le: Pointing to the right cert after redhat-release change
+- Related: #RHEL-24510
+
+* Fri Feb 13 2026 Nicolas Frayer <nfrayer@redhat.com> - 2.12-40
+- ppc/mkimage/appendedsig: Upstream code sync for alignment and sbat
+- Related: #RHEL-24510
+
+* Wed Feb 11 2026 Leo Sandoval <lsandova@redhat.com> - 2.12-39
+- commands/search.c: check possible NULL pointer before dereference
+- Resolves: #RHEL-146317
+
+* Wed Feb 4 2026 Nicolas Frayer <nfrayer@redhat.com> - 2.12-38
+- Fix several security issues about module unloading and file handling
+- Resolves: #RHEL-141581
+- Resolves: #CVE-2025-54770 #CVE-2025-54771 #CVE-2025-61661
+- Resolves: #CVE-2025-61662 #CVE-2025-61663 #CVE-2025-61664
+
+* Mon Jan 26 2026 Leo Sandoval <lsandova@redhat.com> - 2.12-37
+- Include upstream blsuki related patches
+- Resolves: #RHEL-119685
+
+* Fri Dec 05 2025 Leo Sandoval <lsandova@redhat.com> 2.12-36
+- rpminspect: disable abidiff inspections
+- Resolves: #RHEL-134026
+
+* Wed Dec 03 2025 Nicolas Frayer <nfrayer@redhat.com> 2.12-35
+- mkimage/appendedsig: Fix grub-mkimage with an unaligned appended signature size
+- Related: #RHEL-24510
+
+* Fri Nov 21 2025 Nicolas Frayer <nfrayer@redhat.com> 2.12-34
+- powerpc: Add appended signature feature
+- Resolves: #RHEL-24510
+
+* Thu Nov 06 2025 Leo Sandoval <lsandova@redhat.com> 2.12-33
+- Include license into grub-set-password util
+- Resolves: #RHEL-120704
+
+* Tue Oct 28 2025 Leo Sandoval <lsandova@redhat.com> 2.12-32
+- Disable annobin stack protection check
+- Resolves: #RHEL-89464
+
+* Tue Oct 7 2025 Nicolas Frayer <nfrayer@redhat.com> 2.12-31
 - spec: Update signing key to redhatsecureboot802
 - Resolves: #RHEL-116730
+
+* Fri Sep 12 2025 Nicolas Frayer <nfrayer@redhat.com> 2.12-30
+- gating.yaml: Update gating tests as there was a change in where
+test composes are kept
+- Resolves: #RHEL-114488
+
+* Mon Sep 08 2025 Leo Sandoval <lsandova@redhat.com> 2.12-29
+- Fix the fallback mechanism when menu entries fail to boot
+- Resolves: RHEL-113024
 
 * Thu Aug 21 2025 Leo Sandoval <lsandova@redhat.com> 2.12-28
 - Remove strong stack protector on target CFLAGS
