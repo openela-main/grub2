@@ -7,7 +7,7 @@
 Name:                 grub2
 Epoch:                1
 Version:              2.02
-Release:              170%{?dist}.2.openela.0.3
+Release:              170%{?dist}.3.openela.0.3
 Summary:              Bootloader with support for Linux, Multiboot and more
 Group:                System Environment/Base
 License:              GPLv3+
@@ -306,8 +306,17 @@ fi
 
 if [ "$1" = 2 ]; then
     if [ -f /etc/default/grub ]; then
-	! grep -q '^GRUB_ENABLE_BLSCFG=.*' /etc/default/grub && \
-	    /sbin/grub2-switch-to-blscfg --backup-suffix=.rpmsave &>/dev/null || :
+        if ! grep -q '^GRUB_ENABLE_BLSCFG=.*' /etc/default/grub ; then
+            if [[ -n $LEAPP_IPU_IN_PROGRESS ]] && [[ $LEAPP_IPU_IN_PROGRESS == 7to8 ]]; then
+                /sbin/grub2-switch-to-blscfg --backup-suffix=.rpmsave &>/dev/null || :
+            elif [[ -f /boot/grub2/grub.cfg ]]; then
+                if grep -q "^insmod blscfg" /boot/grub2/grub.cfg ; then
+                    sed -i '1iGRUB_ENABLE_BLSCFG=true' /etc/default/grub
+                else
+                    sed -i '1iGRUB_ENABLE_BLSCFG=false' /etc/default/grub
+                fi
+            fi
+        fi
     fi
 fi
 
@@ -524,7 +533,7 @@ fi
 %endif
 
 %changelog
-* Wed Jun 03 2026 Release Engineering <releng@openela.org> - 2.02.openela.0.3
+* Mon Aug 03 2026 Release Engineering <releng@openela.org> - 2.02.openela.0.3
 - Removing redhat old cert sources entries (Sherif Nagy)
 - Preserving rhel8 sbat entry based on shim-review feedback ticket no. 194
 - Adding prod cert
@@ -532,6 +541,10 @@ fi
 - Cleaning up grup.macro extra signing certs and updating openela test CA and CERT
 - Cleaning up grup.macro extra signing certs
 - Adding OpenELA testing CA, CERT and sbat files
+
+* Wed Jul 08 2026 Marta Lewandowska <mlewando@redhat.com> - 2.02-170.3
+- Unless leapping do not force using BLS if it's not defined
+- Resolves: #RHEL-173826
 
 * Mon May 18 2026 Nicolas Frayer <nfrayer@redhat.com> - 2.02-170.2
 - Bump sbat to grub,5
