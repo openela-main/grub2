@@ -16,7 +16,7 @@
 Name:                 grub2
 Epoch:                1
 Version:              2.06
-Release:              126%{?dist}.openela.0.2
+Release:              127%{?dist}.openela.0.2
 Summary:              Bootloader with support for Linux, Multiboot and more
 License:              GPLv3+
 URL:                  http://www.gnu.org/software/grub/
@@ -544,7 +544,7 @@ fi
 %endif
 
 %changelog
-* Tue May 19 2026 Release Engineering <releng@openela.org> - 2.06.openela.0.2
+* Tue Oct 27 2026 Release Engineering <releng@openela.org> - 2.06.openela.0.2
 - Removing redhat old cert sources entries (Sherif Nagy)
 - Preserving rhel8 sbat entry based on shim-review feedback ticket no. 194
 - Adding prod cert
@@ -553,6 +553,11 @@ fi
 - Cleaning up grup.macro extra signing certs
 - Adding OpenELA testing CA, CERT and sbat files
 - Use DER for ppc64le builds from openela-sb-certs (Louis Abel)
+
+* Wed Jun 17 2026 Rolv Apneseth <rapneset@redhat.com> - 2.06-127
+- mdraid: fix metadata 1.0 detection in userspace utilities on IEEE1275
+- grub-install: use search.fs_uuid for RAID1 on IEEE1275
+- Resolves: #RHEL-186889
 
 * Mon Mar 09 2026 Josue Hernandez <josherna@redhat.com> 2.06-126
 - kern/efi/mm: Change grub_efi_mm_add_regions() to keep track of map allocation size

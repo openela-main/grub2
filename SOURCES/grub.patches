@@ -533,3 +533,5 @@ Patch0533: 0533-commands-usbtest-Ensure-string-length-is-sufficient-.patch
 Patch0534: 0534-util-grub-mkimagexx-Stop-generating-unaligned-append.patch
 Patch0535: 0535-grub-mkimage-Do-not-generate-empty-SBAT-metadata.patch
 Patch0536: 0536-kern-efi-mm-Change-grub_efi_mm_add_regions-to-keep-t.patch
+Patch0537: 0537-mdraid-fix-metadata-1.0-detection-in-userspace-utils-on-IEEE1275.patch
+Patch0538: 0538-grub-install-use-search.fs_uuid-for-RAID1-on-IEEE1275.patch
