@@ -17,7 +17,7 @@
 Name:		grub2
 Epoch:		1
 Version:	2.12
-Release:	46%{?dist}
+Release:	56%{?dist}
 Summary:	Bootloader with support for Linux, Multiboot and more
 License:	GPL-3.0-or-later
 URL:		http://www.gnu.org/software/grub/
@@ -40,6 +40,7 @@ Source14:	sbat.ppc.csv
 Source15:	grub-cc.macros
 Source16:	grub-cc.cfg
 Source17:	grub-cc-prefix-embedded.cfg
+Source18:	95-set-boot-entry.install
 
 %include %{SOURCE1}
 %include %{SOURCE15}
@@ -56,7 +57,7 @@ Source17:	grub-cc-prefix-embedded.cfg
 %if 0%{?centos}
 
 %ifarch x86_64 aarch64 ppc64le
-%define sb_key		centossecureboot202
+%define sb_key		centossecureboot802
 %endif
 %else
 %ifarch x86_64 aarch64
@@ -182,7 +183,9 @@ This subpackage provides tools for support of all platforms.
 
 %if 0%{with_efi_arch}
 %{expand:%define_efi_variant %%{package_arch} -o}
+%if 0%{with_efi_cc}
 %{expand:%define_efi_cc_variant %%{package_arch} -o}
+%endif
 %endif
 %if 0%{with_alt_efi_arch}
 %{expand:%define_efi_variant %%{alt_package_arch}}
@@ -248,7 +251,9 @@ git commit -m "After making subdirs"
 %build
 %if 0%{with_efi_arch}
 %{expand:%do_primary_efi_build %%{grubefiarch} %%{grubefiname} %%{grubeficdname} %%{_target_platform} %%{efi_target_cflags} %%{efi_host_cflags} %{sb_ca} %{sb_cer} %{sb_key}}
+%if 0%{with_efi_cc}
 %{expand:%do_primary_efi_cc_build %%{grubefiarch} %%{grubeficcname} %%{grubeficccdname} %%{_target_platform} %%{efi_target_cflags} %%{efi_host_cflags} %{sb_ca} %{sb_cer} %{sb_key}}
+%endif
 %endif
 %if 0%{with_alt_efi_arch}
 %{expand:%do_alt_efi_build %%{grubaltefiarch} %%{grubaltefiname} %%{grubalteficdname} %%{_alt_target_platform} %%{alt_efi_target_cflags} %%{alt_efi_host_cflags} %{sb_ca} %{sb_cer} %{sb_key}}
@@ -278,7 +283,9 @@ rm -fr $RPM_BUILD_ROOT
 %do_common_install
 %if 0%{with_efi_arch}
 %{expand:%do_efi_install %%{grubefiarch} %%{grubefiname} %%{grubeficdname}}
+%if 0%{with_efi_cc}
 %{expand:%do_efi_cc_install %%{grubefiarch} %%{grubeficcname} %%{grubeficccdname}}
+%endif
 %endif
 %if 0%{with_alt_efi_arch}
 %{expand:%do_alt_efi_install %%{grubaltefiarch} %%{grubaltefiname} %%{grubalteficdname}}
@@ -304,6 +311,7 @@ rm -vf ${RPM_BUILD_ROOT}/%{_sbindir}/grub2-macbless
 # Install kernel-install scripts
 install -d -m 0755 %{buildroot}%{_prefix}/lib/kernel/install.d/
 install -D -m 0755 -t %{buildroot}%{_prefix}/lib/kernel/install.d/ %{SOURCE10}
+install -D -m 0755 -t %{buildroot}%{_prefix}/lib/kernel/install.d/ %{SOURCE18}
 install -D -m 0755 -t %{buildroot}%{_prefix}/lib/kernel/install.d/ %{SOURCE3}
 install -d -m 0755 %{buildroot}%{_sysconfdir}/kernel/install.d/
 # Install systemd user service to set the boot_success flag
@@ -338,6 +346,18 @@ ln -s ../grub2-systemd-integration.service \
 	%{nil}
 
 %undefine buildsubdir
+
+%check
+%if %{defined sb_cer}
+%if 0%{with_efi_arch}
+pesigcheck -i $RPM_BUILD_ROOT%{efi_esp_dir}/%{grubefiname} -n0 -c %{sb_cer}
+pesigcheck -i $RPM_BUILD_ROOT%{efi_esp_dir}/%{grubeficdname} -n0 -c %{sb_cer}
+%endif
+%if 0%{with_alt_efi_arch}
+pesigcheck -i $RPM_BUILD_ROOT%{efi_esp_dir}/%{grubaltefiname} -n0 -c %{sb_cer}
+pesigcheck -i $RPM_BUILD_ROOT%{efi_esp_dir}/%{grubalteficdname} -n0 -c %{sb_cer}
+%endif
+%endif
 
 %pre tools
 if [ -f /boot/grub2/user.cfg ]; then
@@ -421,11 +441,81 @@ if test -f ${EFI_HOME}/grubenv; then
     mv --force ${EFI_HOME}/grubenv ${GRUB_HOME}/grubenv
 fi
 
+%if "%{platform}" == "pc"
+%posttrans pc
+set -eu
+set -o pipefail
+
+SYS_FIRMWARE_EFI_DIR=/sys/firmware/efi
+BOOT_DIR=/boot
+
+find_grub_devices() {
+    local boot_device
+    local component_devs=()
+    local block_devs=()
+
+    # Exit if UEFI system running
+    if test -d $SYS_FIRMWARE_EFI_DIR ; then
+	exit 0
+    fi
+
+    # grub2-probe is required for device finding
+    if ! command -v grub2-probe &>/dev/null; then
+	exit 0;
+    fi
+
+    # Get block devices where GRUB is located. We assume GRUB is on the same device
+    # as /boot partition is. In case that device is an md (Multiple Device) device, all
+    # of the component devices of such a device are considered.
+    boot_device=$(grub2-probe --target=device $BOOT_DIR)
+
+    # Check if a given device is an md (Multiple Device) device
+    # It is expected that the "mdadm" command is available,
+    # if it's not it is assumed the device is not an md device.
+    if command -v mdadm &>/dev/null && \
+       mdadm --detail --verbose --brief "$boot_device" &> /dev/null; then
+	out=$(mdadm --detail --verbose --brief "$boot_device")
+	# output would look like:
+	#    ARRAY /dev/md0 level=raid1 num-devices=2 metadata=1.2 name=localhost.localdomain:0 UUID=c4acea6e:d56e1598:91822e3f:fb26832c disable=line-too-long devices=/dev/vda1,/dev/vdb1
+	for d in $(echo "$out" | sed -n -e 's/.* devices=\([^ ]*\).*/\1/p' | sed 's/,/ /g'); do
+	    component_devs+=("$d")
+	done
+    else
+	component_devs+=("$boot_device")
+    fi
+
+    # Get blocks from partitions
+    for d in "${component_devs[@]}"; do
+	block_devs+=("$(lsblk -spnlo name "$d" | tail -1)")
+    done
+
+    # Filter those GRUB blocks
+    for d in "${block_devs[@]}"; do
+	if dd if="$d" bs=446 count=1 status=none | grep -aq "GRUB"; then
+	    echo "$d"
+	fi
+    done
+}
+
+grub_install () {
+    if ! command -v grub2-install &>/dev/null; then
+	exit 0
+    fi
+    for d in $(find_grub_devices); do
+	echo "Installing on $d" >&2
+	grub2-install "$d"
+    done
+}
+
+grub_install || :
+%endif
+
 %files common -f grub.lang
 %dir %{_libdir}/grub/
 %dir %{_datarootdir}/grub/
 %attr(0700,root,root) %dir %{_sysconfdir}/grub.d
 %{_prefix}/lib/kernel/install.d/20-grub.install
+%{_prefix}/lib/kernel/install.d/95-set-boot-entry.install
 %{_prefix}/lib/kernel/install.d/99-grub-mkconfig.install
 %dir %{_datarootdir}/grub
 %exclude %{_datarootdir}/grub/*
@@ -573,7 +663,9 @@ fi
 
 %if 0%{with_efi_arch}
 %{expand:%define_efi_variant_files %%{package_arch} %%{grubefiname} %%{grubeficdname} %%{grubefiarch} %%{target_cpu_name} %%{grub_target_name}}
+%if 0%{with_efi_cc}
 %{expand:%define_efi_cc_variant_files %%{package_arch} %%{grubeficcname} %%{grubeficccdname} %%{grubefiarch} %%{target_cpu_name} %%{grub_target_name}}
+%endif
 %endif
 %if 0%{with_alt_efi_arch}
 %{expand:%define_efi_variant_files %%{alt_package_arch} %%{grubaltefiname} %%{grubalteficdname} %%{grubaltefiarch} %%{alt_target_cpu_name} %%{alt_grub_target_name}}
@@ -593,6 +685,50 @@ fi
 %endif
 
 %changelog
+* Mon Aug 24 2026 Andrea Bolognani <abologna@redhat.com> - 2.12-56
+- Only build CC variant for aarch64 and x86_64
+- Only run pesigcheck if the binaries have actually been signed
+- Use large code model on riscv64
+- Resolves: #RHEL-247584
+
+* Thu Aug 13 2026 Nicolas Frayer <nfrayer@redhat.com> - 2.12-55
+- Rebuild to fix cert issue
+- Resolves: #RHEL-217997
+
+* Mon Jul 20 2026 Leo Sandoval <lsandova@redhat.com> - 2.12-54
+- Run grub2-install automatically on grub2-pc posttrans
+- Resolves: #RHEL-188047
+
+* Mon Jul 20 2026 Josue Hernandez <josherna@redhat.com> - 2.12-53
+- Remove creation of /boot/loader/entries
+- Resolves: #RHEL-78104
+
+* Fri Jul 17 2026 Marta Lewandowska <mlewando@redhat.com> - 2.12-52
+- Add pesigcheck to spec
+- Resolves: #RHEL-188361
+
+* Thu Jul 02 2026 Nicolas Frayer <nfrayer@redhat.com> - 2.12-51
+- ieee1275/powerpc: implements fibre channel discovery for ofpathname
+- Resolves: #RHEL-102160
+- Resolves: #RHEL-102161
+
+* Tue Jun 30 2026 Josue Hernandez <josherna@redhat.com> - 2.12-50
+- Wait for initrmafs and kernel to be installed before set default kernel
+- Resolves: #RHEL-188168
+
+* Mon Jun 15 2026 Rolv Apneseth <rapneset@redhat.com> - 2.12-49
+- mdraid: fix metadata 1.0 detection in userspace utilities on IEEE1275
+- grub-install: use search.fs_uuid for RAID1 on IEEE1275
+- Resolves: #RHEL-184859
+
+* Fri Jun 05 2026 Nicolas Frayer <nfrayer@redhat.com> - 2.12-48
+- Centos: sign grub with 802
+- Resolves: #RHEL-182485
+
+* Wed May 27 2026 Josue Hernandez <josherna@redhat.com> - 2.12-47
+- Change login error message for more user frienly version
+- Resolves: #RHEL-179058
+
 * Fri Mar 27 2026 Leo Sandoval <lsandova@redhat.com> - 2.12-46
 - New package grub2-efi-x64-cc for confidential computing workloads
 - Resolves: #RHEL-127909

@@ -431,3 +431,15 @@ Patch0431: 0431-commands-tpm.c-include-PCR-check-enable-disable-func.patch
 Patch0432: 0432-commands-efi-tpm.c-check-if-PCR-is-enable-before-TPM.patch
 Patch0433: 0433-tpm.c-disable-PCR8-measurements-at-the-configuration.patch
 Patch0434: 0434-Add-support-for-efi-keyword.patch
+Patch0436: 0435-Change-login-error-message.patch
+Patch0437: 0437-mdraid-fix-metadata-1.0-detection-in-userspace-utils-on-IEEE1275.patch
+Patch0438: 0438-grub-install-use-search.fs_uuid-for-RAID1-on-IEEE1275.patch
+Patch0439: 0439-ieee1275-powerpc-implements-fibre-channel-discovery-.patch
+Patch0440: 0440-ieee1275-implement-FCP-methods-for-WWPN-and-LUNs.patch
+Patch0441: 0441-ieee1275-change-the-logic-of-ieee1275_get_devargs.patch
+Patch0442: 0442-ieee1275-ofpath-enable-NVMeoF-logical-device-transla.patch
+Patch0443: 0443-ieee1275-support-added-for-multiple-nvme-bootpaths.patch
+Patch0444: 0444-ieee1275-add-support-for-NVMeoFC.patch
+Patch0445: 0445-Revert-Use-medany-instead-of-large-model-for-RISCV.patch
+Patch0446: 0446-configure-Add-mno-relax-on-riscv.patch
+Patch0447: 0447-configure-Defer-check-for-mcmodel-large-until-PIC-PI.patch
