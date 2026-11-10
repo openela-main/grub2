@@ -533,5 +533,12 @@ Patch0533: 0533-commands-usbtest-Ensure-string-length-is-sufficient-.patch
 Patch0534: 0534-util-grub-mkimagexx-Stop-generating-unaligned-append.patch
 Patch0535: 0535-grub-mkimage-Do-not-generate-empty-SBAT-metadata.patch
 Patch0536: 0536-kern-efi-mm-Change-grub_efi_mm_add_regions-to-keep-t.patch
-Patch0537: 0537-mdraid-fix-metadata-1.0-detection-in-userspace-utils-on-IEEE1275.patch
-Patch0538: 0538-grub-install-use-search.fs_uuid-for-RAID1-on-IEEE1275.patch
+Patch0537: 0537-Change-login-error-message.patch
+Patch0538: 0538-ieee1275-powerpc-implements-fibre-channel-discovery-.patch
+Patch0539: 0539-ieee1275-implement-FCP-methods-for-WWPN-and-LUNs.patch
+Patch0540: 0540-ieee1275-change-the-logic-of-ieee1275_get_devargs.patch
+Patch0541: 0541-ieee1275-ofpath-enable-NVMeoF-logical-device-transla.patch
+Patch0542: 0542-ieee1275-support-added-for-multiple-nvme-bootpaths.patch
+Patch0543: 0543-ieee1275-add-support-for-NVMeoFC.patch
+Patch0544: 0544-mdraid-fix-metadata-1.0-detection-in-userspace-utils-on-IEEE1275.patch
+Patch0545: 0545-grub-install-use-search.fs_uuid-for-RAID1-on-IEEE1275.patch

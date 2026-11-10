@@ -586,7 +586,6 @@ cp docs/grub-dev.info						\\\
 	$RPM_BUILD_ROOT%{_infodir}/%{name}-dev.info		\
 install -d -m 0700 ${RPM_BUILD_ROOT}%{efi_esp_dir}/		\
 install -d -m 0700 ${RPM_BUILD_ROOT}/boot/%{name}/		\
-install -d -m 0700 ${RPM_BUILD_ROOT}/boot/loader/entries	\
 install -d -m 0700 ${RPM_BUILD_ROOT}/boot/%{name}/themes/system	\
 install -d -m 0700 ${RPM_BUILD_ROOT}%{_sysconfdir}/default	\
 install -d -m 0700 ${RPM_BUILD_ROOT}%{_sysconfdir}/sysconfig	\
@@ -604,7 +603,6 @@ ln -s ../boot/%{name}/grub.cfg					\\\
 %defattr(-,root,root,-)						\
 %config(noreplace) %{_sysconfdir}/%{name}.cfg			\
 %ghost %config(noreplace) %attr(0600,root,root)/boot/%{name}/grub.cfg	\
-%dir %attr(0700,root,root)/boot/loader/entries			\
 %attr(0644,root,root) %config(noreplace) /etc/dnf/protected.d/%{name}-%{1}.conf \
 %ifarch ppc64le						\
 %dir %{_libdir}/grub/%{2}/					\
@@ -638,7 +636,6 @@ ln -s ../boot/%{name}/grub.cfg					\\\
 %endif								\
 %attr(0700,root,root)/boot/%{name}/fonts			\
 %attr(0700,root,root)/usr/bin/gen_grub_cfgstub			\
-%dir %attr(0700,root,root)/boot/loader/entries			\
 %ghost %config(noreplace) %attr(0600,root,root)/boot/%{name}/grub.cfg	\
 %ghost %config(noreplace) %verify(not mtime) %attr(0700,root,root)%{efi_esp_dir}/grub.cfg	\
 %config(noreplace) %verify(not size mode md5 mtime) /boot/%{name}/grubenv	\
